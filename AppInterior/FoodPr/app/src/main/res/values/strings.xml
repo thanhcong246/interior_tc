@@ -27,4 +27,6 @@
     <string name="getback_password">Mật khẩu mới</string>
     <string name="getback_confirm_password">Nhập lại mật khẩu</string>
     <string name="getback_submit">Xác nhận</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

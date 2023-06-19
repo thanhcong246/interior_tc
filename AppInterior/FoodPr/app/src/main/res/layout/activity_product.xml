@@ -9,25 +9,53 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
-    <!-- NavigationView -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation_bar"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/navi_bottom"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        app:itemIconTint="@drawable/selector_bottom_nav_item"
-        app:itemTextColor="@drawable/selector_bottom_nav_item"
-        app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu_navigation" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- NavigationView -->
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_navigation_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/navi_bottom"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:itemIconTint="@drawable/selector_bottom_nav_item"
+                app:itemTextColor="@drawable/selector_bottom_nav_item"
+                app:labelVisibilityMode="unlabeled"
+                app:menu="@menu/menu_navigation" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="100dp"
+            android:background="@drawable/bg_home_notification">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="99"
+                android:textColor="#FFFFFF"
+                android:textSize="11dp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

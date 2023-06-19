@@ -18,6 +18,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_item"
         android:layout_width="match_parent"
+        app:cardCornerRadius="15dp"
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -53,8 +54,9 @@
                 android:id="@+id/product_item_adapter_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:layout_marginBottom="5dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="Sản phẩm 1"
                 android:textColor="@color/white"
                 android:textSize="16dp"

@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
-        android:id="@+id/nav_home"
+        android:id="@+id/nav_home_fragment"
         android:title="Trang chủ"
         android:icon="@drawable/home_20"/>
     <item
-        android:id="@+id/nav_product"
+        android:id="@+id/nav_product_fragment"
         android:title="Sản phẩm"
         android:icon="@drawable/apps_20"/>
     <item
-        android:id="@+id/nav_cart"
+        android:id="@+id/nav_cart_fragment"
         android:title="Giỏ hàng"
         android:icon="@drawable/shopping_cart_20"/>
     <item
-        android:id="@+id/nav_settings"
+        android:id="@+id/nav_notification_fragment"
+        android:title="Thông báo"
+        android:icon="@drawable/bell_20"/>
+    <item
+        android:id="@+id/nav_settings_fragment"
         android:title="Cài đặt"
         android:icon="@drawable/settings_20"/>
 
