@@ -222,26 +222,22 @@ function add_product()
     global $con;
 
     $name = $_POST["name"];
-    $description = $_POST["description"];
     $price = $_POST["price"];
     $category_id = $_POST["category_id"];
-    $specifications = $_POST["specifications"];
 
     $name = mysqli_real_escape_string($con, $name);
-    $description = mysqli_real_escape_string($con, $description);
-    $specifications = mysqli_real_escape_string($con, $specifications);
 
     if (isset($_FILES['image'])) {
         $image_file = $_FILES['image']['tmp_name'];
         $image_name = $_FILES['image']['name'];
-        $image_path = 'uploads/' . $image_name;
+        $image_path = 'uploads/' . uniqid() . '.' . $image_name;
 
         // Di chuyển tệp hình ảnh vào thư mục uploads
         if (move_uploaded_file($image_file, $image_path)) {
             $image_filename = basename($image_path);
 
-            $query = "INSERT INTO Products (name, description, image_url, price, category_id, specifications)
-                      VALUES ('$name', '$description', '$image_filename', $price, $category_id, '$specifications')";
+            $query = "INSERT INTO Products (name, image_url, price, category_id)
+                      VALUES ('$name', '$image_filename', $price, $category_id)";
 
             if (mysqli_query($con, $query)) {
                 $response = array("errorcode" => "000", "message" => "Product added successfully");
@@ -266,27 +262,35 @@ function update_product()
 
     $product_id = $_POST["product_id"];
     $name = $_POST["name"];
-    $description = $_POST["description"];
     $price = $_POST["price"];
     $category_id = $_POST["category_id"];
-    $specifications = $_POST["specifications"];
 
     $name = mysqli_real_escape_string($con, $name);
-    $description = mysqli_real_escape_string($con, $description);
-    $specifications = mysqli_real_escape_string($con, $specifications);
+
+    // Lấy thông tin sản phẩm cũ
+    $query_select = "SELECT image_url FROM Products WHERE product_id = $product_id";
+    $result_select = mysqli_query($con, $query_select);
+    $row_select = mysqli_fetch_assoc($result_select);
+    $old_image = $row_select['image_url'];
 
     if (isset($_FILES['image'])) {
         $image_file = $_FILES['image']['tmp_name'];
         $image_name = $_FILES['image']['name'];
-        $image_path = 'uploads/' . $image_name;
+        $image_path = 'uploads/' . uniqid() . '.' . $image_name;
 
-        // Di chuyển tệp hình ảnh vào thư mục uploads
+        // Xóa ảnh cũ
+        if (!empty($old_image)) {
+            $old_image_path = 'uploads/' . $old_image;
+            if (file_exists($old_image_path)) {
+                unlink($old_image_path);
+            }
+        }
+
+        // Di chuyển tệp hình ảnh mới vào thư mục uploads
         if (move_uploaded_file($image_file, $image_path)) {
             $image_filename = basename($image_path);
 
-            $query = "UPDATE Products SET name = '$name', description = '$description', image_url = '$image_filename', 
-                      price = $price, category_id = $category_id, specifications = '$specifications'
-                      WHERE product_id = $product_id";
+            $query = "UPDATE Products SET name = '$name', image_url = '$image_filename', price = $price, category_id = $category_id WHERE product_id = $product_id";
 
             if (mysqli_query($con, $query)) {
                 $response = array("errorcode" => "000", "message" => "Product updated successfully");
@@ -300,9 +304,7 @@ function update_product()
             echo json_encode($response);
         }
     } else {
-        $query = "UPDATE Products SET name = '$name', description = '$description', price = $price, 
-                  category_id = $category_id, specifications = '$specifications'
-                  WHERE product_id = $product_id";
+        $query = "UPDATE Products SET name = '$name', price = $price, category_id = $category_id WHERE product_id = $product_id";
 
         if (mysqli_query($con, $query)) {
             $response = array("errorcode" => "000", "message" => "Product updated successfully");
@@ -393,6 +395,317 @@ function get_all_product()
     }
 }
 
+function get_product_by_id()
+{
+    global $con;
+
+    $product_id = $_POST["product_id"];
+
+    $query = "SELECT Products.product_id, Products.name, Products.price, Product_Details.img_url_one, Product_Details.img_url_two, Product_Details.img_url_three, Product_Details.img_url_four
+              FROM Products
+              LEFT JOIN product_details ON Products.product_id = product_details.product_id
+              WHERE Products.product_id = '$product_id'";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $products[] = $row;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("error_product_by_id" => "111", "message" => "Product not found");
+        echo json_encode($response);
+    }
+}
+
+function add_product_descriptions()
+{
+    global $con;
+
+    $description = $_POST["description"];
+    $product_id = $_POST["product_id"];
+
+    $description = mysqli_real_escape_string($con, $description);
+
+
+    $query = "INSERT INTO product_detail_descriptions (description, product_id) VALUES ('$description', '$product_id')";
+
+    if (mysqli_query($con, $query)) {
+        $response = array("error_product_detail_descriptions" => "000", "message" => "Product desc added successfully");
+        echo json_encode($response);
+    } else {
+        $response = array("error_product_detail_descriptions" => "111", "message" => "Failed to add product desc");
+        echo json_encode($response);
+    }
+
+}
+
+function add_product_detail_imgs()
+{
+    global $con;
+
+    $product_id = $_POST["product_id"];
+
+    if (isset($_FILES['img_url_one'])) {
+        $image_file_img_url_one = $_FILES['img_url_one']['tmp_name'];
+        $image_name_img_url_one = $_FILES['img_url_one']['name'];
+        $image_extension_img_url_one = pathinfo($image_name_img_url_one, PATHINFO_EXTENSION);
+        $image_path_img_url_one = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_one;
+
+        $image_file_img_url_two = $_FILES['img_url_two']['tmp_name'];
+        $image_name_img_url_two = $_FILES['img_url_two']['name'];
+        $image_extension_img_url_two = pathinfo($image_name_img_url_two, PATHINFO_EXTENSION);
+        $image_path_img_url_two = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_two;
+
+        $image_file_img_url_three = $_FILES['img_url_three']['tmp_name'];
+        $image_name_img_url_three = $_FILES['img_url_three']['name'];
+        $image_extension_img_url_three = pathinfo($image_name_img_url_three, PATHINFO_EXTENSION);
+        $image_path_img_url_three = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_three;
+
+        $image_file_img_url_four = $_FILES['img_url_four']['tmp_name'];
+        $image_name_img_url_four = $_FILES['img_url_four']['name'];
+        $image_extension_img_url_four = pathinfo($image_name_img_url_four, PATHINFO_EXTENSION);
+        $image_path_img_url_four = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_four;
+
+        // Di chuyển tệp hình ảnh vào thư mục
+        if (move_uploaded_file($image_file_img_url_one, $image_path_img_url_one)) {
+            move_uploaded_file($image_file_img_url_two, $image_path_img_url_two);
+            move_uploaded_file($image_file_img_url_three, $image_path_img_url_three);
+            move_uploaded_file($image_file_img_url_four, $image_path_img_url_four);
+
+            $image_filename_img_one = basename($image_path_img_url_one);
+            $image_filename_img_two = basename($image_path_img_url_two);
+            $image_filename_img_three = basename($image_path_img_url_three);
+            $image_filename_img_four = basename($image_path_img_url_four);
+
+            $query = "INSERT INTO product_details (img_url_one, img_url_two, img_url_three, img_url_four, product_id)
+                      VALUES ('$image_filename_img_one', '$image_filename_img_two', '$image_filename_img_three', '$image_filename_img_four', '$product_id')";
+
+            if (mysqli_query($con, $query)) {
+                $response = array("errorcode_detail_imgs" => "000", "message" => "Product detail imgs added successfully");
+                echo json_encode($response);
+            } else {
+                $response = array("errorcode_detail_imgs" => "111", "message" => "Failed to add product details imgs");
+                echo json_encode($response);
+            }
+        } else {
+            $response = array("errorcode_detail_imgs" => "111", "message" => "Failed to move uploaded image");
+            echo json_encode($response);
+        }
+    } else {
+        $response = array("errorcode_detail_imgs" => "111", "message" => "No image uploaded");
+        echo json_encode($response);
+    }
+}
+
+
+function update_product_detail_imgs()
+{
+    global $con;
+
+    $product_detail_id = $_POST["product_detail_id"];
+    $product_id = $_POST["product_id"];
+
+    // Lấy thông tin ảnh cũ
+    $query_select = "SELECT img_url_one, img_url_two, img_url_three, img_url_four FROM product_details WHERE product_detail_id = product_detail_id";
+    $result_select = mysqli_query($con, $query_select);
+    $row_select = mysqli_fetch_assoc($result_select);
+    $old_img_url_one = $row_select['img_url_one'];
+    $old_img_url_two = $row_select['img_url_two'];
+    $old_img_url_three = $row_select['img_url_three'];
+    $old_img_url_four = $row_select['img_url_four'];
+
+    if (isset($_FILES['img_url_one'])) {
+        $image_file_img_url_one = $_FILES['img_url_one']['tmp_name'];
+        $image_name_img_url_one = $_FILES['img_url_one']['name'];
+        $image_extension_img_url_one = pathinfo($image_name_img_url_one, PATHINFO_EXTENSION);
+        $image_path_img_url_one = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_one;
+
+        $image_file_img_url_two = $_FILES['img_url_two']['tmp_name'];
+        $image_name_img_url_two = $_FILES['img_url_two']['name'];
+        $image_extension_img_url_two = pathinfo($image_name_img_url_two, PATHINFO_EXTENSION);
+        $image_path_img_url_two = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_two;
+
+        $image_file_img_url_three = $_FILES['img_url_three']['tmp_name'];
+        $image_name_img_url_three = $_FILES['img_url_three']['name'];
+        $image_extension_img_url_three = pathinfo($image_name_img_url_three, PATHINFO_EXTENSION);
+        $image_path_img_url_three = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_three;
+
+        $image_file_img_url_four = $_FILES['img_url_four']['tmp_name'];
+        $image_name_img_url_four = $_FILES['img_url_four']['name'];
+        $image_extension_img_url_four = pathinfo($image_name_img_url_four, PATHINFO_EXTENSION);
+        $image_path_img_url_four = 'img_product_details/' . uniqid() . '.' . $image_extension_img_url_four;
+
+        // Xóa ảnh cũ
+        if (!empty($old_img_url_one)) {
+            $old_image_path_one = 'img_product_details/' . $old_img_url_one;
+            if (file_exists($old_image_path_one)) {
+                unlink($old_image_path_one);
+            }
+        }
+
+        if (!empty($old_img_url_two)) {
+            $old_image_path_two = 'img_product_details/' . $old_img_url_two;
+            if (file_exists($old_image_path_two)) {
+                unlink($old_image_path_two);
+            }
+        }
+
+        if (!empty($old_img_url_three)) {
+            $old_image_path_three = 'img_product_details/' . $old_img_url_three;
+            if (file_exists($old_image_path_three)) {
+                unlink($old_image_path_three);
+            }
+        }
+
+        if (!empty($old_img_url_four)) {
+            $old_image_path_four = 'img_product_details/' . $old_img_url_four;
+            if (file_exists($old_image_path_four)) {
+                unlink($old_image_path_four);
+            }
+        }
+
+        // Di chuyển tệp hình ảnh mới vào thư mục
+        if (move_uploaded_file($image_file_img_url_one, $image_path_img_url_one)) {
+            move_uploaded_file($image_file_img_url_two, $image_path_img_url_two);
+            move_uploaded_file($image_file_img_url_three, $image_path_img_url_three);
+            move_uploaded_file($image_file_img_url_four, $image_path_img_url_four);
+
+            $image_filename_img_one = basename($image_path_img_url_one);
+            $image_filename_img_two = basename($image_path_img_url_two);
+            $image_filename_img_three = basename($image_path_img_url_three);
+            $image_filename_img_four = basename($image_path_img_url_four);
+
+            $query = "UPDATE product_details SET img_url_one = '$image_filename_img_one', img_url_two = '$image_filename_img_two', img_url_three = '$image_filename_img_three', img_url_four = '$image_filename_img_four', product_id = '$product_id' WHERE product_detail_id = $product_detail_id";
+
+            if (mysqli_query($con, $query)) {
+                $response = array("errorcode_detail_imgs" => "000", "message" => "Product detail imgs updated successfully");
+                echo json_encode($response);
+            } else {
+                $response = array("errorcode_detail_imgs" => "111", "message" => "Failed to update product details imgs");
+                echo json_encode($response);
+            }
+        } else {
+            $response = array("errorcode_detail_imgs" => "111", "message" => "Failed to move uploaded image");
+            echo json_encode($response);
+        }
+    } else {
+        $response = array("errorcode_detail_imgs" => "111", "message" => "No image uploaded");
+        echo json_encode($response);
+    }
+}
+
+
+function add_specifications()
+{
+
+    global $con;
+
+    $product_id = $_POST["product_id"];
+    $width = $_POST["width"];
+    $height = $_POST["height"];
+    $number_of_drawers = $_POST["number_of_drawers"];
+    $type = $_POST["type"];
+
+    $width = mysqli_real_escape_string($con, $width);
+    $height = mysqli_real_escape_string($con, $height);
+    $number_of_drawers = mysqli_real_escape_string($con, $number_of_drawers);
+    $type = mysqli_real_escape_string($con, $type);
+
+    $query = "INSERT INTO specifications (width, height, number_of_drawers, type, product_id) 
+                        VALUES ('$width', '$height', '$number_of_drawers', '$type', '$product_id')";
+
+    if (mysqli_query($con, $query)) {
+        $response = array("error_product_detail_specifications" => "000", "message" => "Product specifications added successfully");
+        echo json_encode($response);
+    } else {
+        $response = array("error_product_detail_specifications" => "111", "message" => "Failed to add product specifications");
+        echo json_encode($response);
+    }
+}
+
+function update_specifications()
+{
+    global $con;
+
+    $specification_id = $_POST["specification_id"];
+    $product_id = $_POST["product_id"];
+    $width = $_POST["width"];
+    $height = $_POST["height"];
+    $number_of_drawers = $_POST["number_of_drawers"];
+    $type = $_POST["type"];
+
+    $width = mysqli_real_escape_string($con, $width);
+    $height = mysqli_real_escape_string($con, $height);
+    $number_of_drawers = mysqli_real_escape_string($con, $number_of_drawers);
+    $type = mysqli_real_escape_string($con, $type);
+
+    $query = "UPDATE specifications SET width = '$width', height = '$height', number_of_drawers = '$number_of_drawers', type = '$type', product_id = '$product_id' WHERE specification_id = '$specification_id'";
+
+    if (mysqli_query($con, $query)) {
+        $response = array("error_product_detail_specifications" => "000", "message" => "Product specifications updated successfully");
+        echo json_encode($response);
+    } else {
+        $response = array("error_product_detail_specifications" => "111", "message" => "Failed to update product specifications");
+        echo json_encode($response);
+    }
+}
+
+function get_product_by_id_description()
+{
+    global $con;
+
+    $product_id = $_POST["product_id"];
+
+    $query = "SELECT product_detail_descriptions.description
+          FROM product_detail_descriptions
+          LEFT JOIN Products ON product_detail_descriptions.product_id = Products.product_id
+          WHERE Products.product_id = '$product_id'";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $products[] = $row;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("error_product_by_id_desc" => "111");
+        echo json_encode($response);
+    }
+}
+
+function get_product_by_id_specification()
+{
+    global $con;
+
+    $product_id = $_POST["product_id"];
+
+    $query = "SELECT specifications.width, specifications.height, specifications.number_of_drawers, specifications.type
+          FROM specifications
+          LEFT JOIN Products ON specifications.product_id = Products.product_id
+          WHERE Products.product_id = '$product_id'";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $products[] = $row;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("error_product_by_id_spec" => "111");
+        echo json_encode($response);
+    }
+}
+
 
 switch ($action) {
     case "register":
@@ -437,6 +750,38 @@ switch ($action) {
 
     case "get_all_product":
         get_all_product();
+        break;
+
+    case "get_product_by_id":
+        get_product_by_id();
+        break;
+
+    case "add_product_descriptions";
+        add_product_descriptions();
+        break;
+
+    case "add_product_detail_imgs":
+        add_product_detail_imgs();
+        break;
+
+    case "update_product_detail_imgs":
+        update_product_detail_imgs();
+        break;
+
+    case "add_specifications":
+        add_specifications();
+        break;
+
+    case "update_specifications":
+        update_specifications();
+        break;
+
+    case "get_product_by_id_description":
+        get_product_by_id_description();
+        break;
+
+    case "get_product_by_id_specification":
+        get_product_by_id_specification();
         break;
 
     default :
