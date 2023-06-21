@@ -27,9 +27,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vn.tcshop.foodapp.Accounts.LoginActivity;
 import com.vn.tcshop.foodapp.Adapters.MenuAdapter;
+import com.vn.tcshop.foodapp.Carts.CartActivity;
 import com.vn.tcshop.foodapp.HomeActivity;
 import com.vn.tcshop.foodapp.Models.MenuItemModel;
+import com.vn.tcshop.foodapp.Products.ProductActivity;
 import com.vn.tcshop.foodapp.R;
+import com.vn.tcshop.foodapp.Settings.SettingActivity;
 
 import org.w3c.dom.Text;
 
@@ -72,6 +75,34 @@ public class MenuFragment extends Fragment {
         btn_logout = view.findViewById(R.id.btn_logout);
         btn_close_fragment_menu = view.findViewById(R.id.btn_close_fragment_menu);
 
+
+        menuAdapter.setOnItemClickListener(new MenuAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(MenuItemModel menuItem) {
+                // Xử lý sự kiện khi một mục trong menu được chọn
+                String itemId = menuItem.getTitle();
+
+                // Kiểm tra ID của mục menu và chuyển đến trang tương ứng
+                switch (itemId) {
+                    case "Trang chủ":
+                        break;
+                    case "Sản phẩm":
+                        startActivity(new Intent(getActivity(), ProductActivity.class));
+                        break;
+                    case "Giỏ hàng":
+                        startActivity(new Intent(getActivity(), CartActivity.class));
+                        break;
+                    case "Thông báo":
+                        break;
+                    case "Cài đặt":
+                        startActivity(new Intent(getActivity(), SettingActivity.class));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
         sharedPreferences = requireContext().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         if (sharedPreferences.getBoolean(KEY_REMEMBER_ME, false)) {
             String savedName = sharedPreferences.getString(KEY_NAME, "");
@@ -87,6 +118,12 @@ public class MenuFragment extends Fragment {
         close_menu();
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_fragment_home, menu);
     }
 
     private void close_menu() {

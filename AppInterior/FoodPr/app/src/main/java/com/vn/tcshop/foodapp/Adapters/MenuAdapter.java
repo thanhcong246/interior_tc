@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +17,16 @@ import java.util.List;
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder> {
 
     private List<MenuItemModel> menuItems;
+
+    private OnItemClickListener itemClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(MenuItemModel menuItem);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        itemClickListener = listener;
+    }
 
     public MenuAdapter(List<MenuItemModel> menuItems) {
         this.menuItems = menuItems;
@@ -48,6 +59,18 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
             super(itemView);
             titleTextView = itemView.findViewById(R.id.titleTextView);
             iconImageView = itemView.findViewById(R.id.iconImageView);
+
+            // Gọi phương thức onItemClick khi itemView được click
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                        MenuItemModel menuItem = menuItems.get(position);
+                        itemClickListener.onItemClick(menuItem);
+                    }
+                }
+            });
         }
 
         public void bind(MenuItemModel menuItem) {

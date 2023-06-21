@@ -1,6 +1,8 @@
 package com.vn.tcshop.foodapp.Apis;
 
 import com.vn.tcshop.foodapp.Models.Product;
+import com.vn.tcshop.foodapp.Models.Product_detail;
+import com.vn.tcshop.foodapp.Models.Product_detail_desc;
 import com.vn.tcshop.foodapp.Responses.LoginResponse;
 import com.vn.tcshop.foodapp.Responses.RecoverCodePesponse;
 import com.vn.tcshop.foodapp.Responses.RecoverCodeToPesponse;
@@ -60,4 +62,22 @@ public interface RetrofitApi {
 
     @GET("get_all_product")
     Call<List<Product>> get_all_product();
+
+    @FormUrlEncoded
+    @POST("get_product_by_id")
+    Call<List<Product_detail>> get_product_by_id(
+            @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
+    @POST("get_product_by_id_description")
+    Call<List<Product_detail_desc>> get_product_by_id_description(
+            @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
+    @POST("get_product_by_id_specification")
+    Call<List<Product_detail_desc>> get_product_by_id_specification(
+            @Field("product_id") int product_id
+    );
 }

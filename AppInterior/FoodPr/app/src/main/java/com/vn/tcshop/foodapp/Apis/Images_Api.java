@@ -7,4 +7,9 @@ public class Images_Api {
         String imagePath = "uploads/" + imageName;
         return BASE_URL + imagePath;
     }
+
+    public static String getImageProductDetailUrl(String imageName){
+        String imagePath = "img_product_details/" + imageName;
+        return BASE_URL + imagePath;
+    }
 }

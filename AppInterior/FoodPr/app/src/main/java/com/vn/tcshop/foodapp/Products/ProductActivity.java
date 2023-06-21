@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,15 +15,18 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.vn.tcshop.foodapp.Adapters.Products.ProductAdapter;
+import com.vn.tcshop.foodapp.Adapters.Products.SliderAdapter;
 import com.vn.tcshop.foodapp.Apis.RetrofitApi;
 import com.vn.tcshop.foodapp.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Configs.Constant;
 import com.vn.tcshop.foodapp.HomeActivity;
 import com.vn.tcshop.foodapp.Models.Product;
+import com.vn.tcshop.foodapp.Models.Product_detail;
 import com.vn.tcshop.foodapp.R;
 import com.vn.tcshop.foodapp.Settings.SettingActivity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -62,10 +66,43 @@ public class ProductActivity extends AppCompatActivity {
         ProductAdapter.ItemClickListener itemClickListener = new ProductAdapter.ItemClickListener() {
             @Override
             public void onItemClick(int productId) {
-                //Chuyển sang trang chi tiết sản phẩm với ID của sản phẩm được nhấp
-                Intent intent = new Intent(ProductActivity.this, ProductDetailActivity.class);
-                intent.putExtra("productId", productId);
-                startActivity(intent);
+                RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+                Call<List<Product_detail>> call = retrofitApi.get_product_by_id(productId);
+                call.enqueue(new Callback<List<Product_detail>>() {
+                    @Override
+                    public void onResponse(Call<List<Product_detail>> call, Response<List<Product_detail>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().size() > 0) {
+                            Product_detail product_detail = response.body().get(0);
+                            int product_id_dt = product_detail.getProduct_id();
+                            int product_detail_id_dt = product_detail.getProduct_detail_id();
+                            String product_name_dt = product_detail.getName();
+                            int product_detail_price_dt = product_detail.getPrice();
+                            String img_url_one_dt = product_detail.getImg_url_one();
+                            String img_url_two_dt = product_detail.getImg_url_two();
+                            String img_url_three_dt = product_detail.getImg_url_three();
+                            String img_url_four_dt = product_detail.getImg_url_four();
+
+                            //Chuyển sang trang chi tiết sản phẩm với ID của sản phẩm được nhấp
+                            Intent intent = new Intent(ProductActivity.this, ProductDetailActivity.class);
+                            intent.putExtra("productId", product_id_dt);
+                            intent.putExtra("product_detail_id", product_detail_id_dt);
+                            intent.putExtra("product_name", product_name_dt);
+                            intent.putExtra("product_detail_price", product_detail_price_dt);
+                            intent.putExtra("img_url_one", img_url_one_dt);
+                            intent.putExtra("img_url_two", img_url_two_dt);
+                            intent.putExtra("img_url_three", img_url_three_dt);
+                            intent.putExtra("img_url_four", img_url_four_dt);
+                            startActivity(intent);
+                        } else {
+                            // Xử lý khi không có dữ liệu hoặc lỗi trong phản hồi từ API
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Product_detail>> call, Throwable t) {
+                        // Xử lý khi gọi API thất bại
+                    }
+                });
             }
         };
         // Thiết lập ItemClickListener cho adapter
@@ -97,7 +134,6 @@ public class ProductActivity extends AppCompatActivity {
         });
 
     }
-
 
     private void bottomNavigationView() {
         bottomNavigationView.setSelectedItemId(R.id.nav_product);
