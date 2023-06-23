@@ -222,8 +222,9 @@ function add_product()
     global $con;
 
     $name = $_POST["name"];
-    $price = $_POST["price"];
+    $old_price = $_POST["old_price"];
     $category_id = $_POST["category_id"];
+    $discount = $_POST["discount"];
 
     $name = mysqli_real_escape_string($con, $name);
 
@@ -236,8 +237,8 @@ function add_product()
         if (move_uploaded_file($image_file, $image_path)) {
             $image_filename = basename($image_path);
 
-            $query = "INSERT INTO Products (name, image_url, price, category_id)
-                      VALUES ('$name', '$image_filename', $price, $category_id)";
+            $query = "INSERT INTO Products (name, image_url, old_price, category_id, discount)
+                      VALUES ('$name', '$image_filename', $old_price, $category_id, $discount)";
 
             if (mysqli_query($con, $query)) {
                 $response = array("errorcode" => "000", "message" => "Product added successfully");
@@ -262,8 +263,9 @@ function update_product()
 
     $product_id = $_POST["product_id"];
     $name = $_POST["name"];
-    $price = $_POST["price"];
+    $old_price = $_POST["old_price"];
     $category_id = $_POST["category_id"];
+    $discount = $_POST["discount"];
 
     $name = mysqli_real_escape_string($con, $name);
 
@@ -290,7 +292,7 @@ function update_product()
         if (move_uploaded_file($image_file, $image_path)) {
             $image_filename = basename($image_path);
 
-            $query = "UPDATE Products SET name = '$name', image_url = '$image_filename', price = $price, category_id = $category_id WHERE product_id = $product_id";
+            $query = "UPDATE Products SET name = '$name', image_url = '$image_filename', old_price = $old_price, category_id = $category_id, discount = $discount WHERE product_id = $product_id";
 
             if (mysqli_query($con, $query)) {
                 $response = array("errorcode" => "000", "message" => "Product updated successfully");
@@ -304,7 +306,7 @@ function update_product()
             echo json_encode($response);
         }
     } else {
-        $query = "UPDATE Products SET name = '$name', price = $price, category_id = $category_id WHERE product_id = $product_id";
+        $query = "UPDATE Products SET name = '$name', old_price = $old_price, category_id = $category_id, discount = $discount WHERE product_id = $product_id";
 
         if (mysqli_query($con, $query)) {
             $response = array("errorcode" => "000", "message" => "Product updated successfully");
@@ -372,7 +374,7 @@ function get_all_product()
 {
     global $con;
 
-    $query = "SELECT * FROM Products";
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM Products";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
@@ -401,7 +403,7 @@ function get_product_by_id()
 
     $product_id = $_POST["product_id"];
 
-    $query = "SELECT Products.product_id, Products.name, Products.price, Product_Details.img_url_one, Product_Details.img_url_two, Product_Details.img_url_three, Product_Details.img_url_four
+    $query = "SELECT Products.product_id, Products.name, Products.old_price, Products.discount, CAST(Products.old_price - (Products.old_price * Products.discount / 100) AS INT) AS price, Product_Details.img_url_one, Product_Details.img_url_two, Product_Details.img_url_three, Product_Details.img_url_four
               FROM Products
               LEFT JOIN product_details ON Products.product_id = product_details.product_id
               WHERE Products.product_id = '$product_id'";
@@ -707,6 +709,103 @@ function get_product_by_id_specification()
 }
 
 
+function add_product_detail_reviews()
+{
+    global $con;
+
+    $product_id = $_POST["product_id"];
+    $content = $_POST["content"];
+    $rating = $_POST["rating"];
+    $user_name = $_POST["user_name"];
+
+    $content = mysqli_real_escape_string($con, $content);
+    $rating = mysqli_real_escape_string($con, $rating);
+    $user_name = mysqli_real_escape_string($con, $user_name);
+
+    $query = "INSERT INTO reviews (product_id, content, rating, user_name, comment_date) 
+              VALUES ('$product_id', '$content', '$rating', '$user_name', NOW())";
+
+    if (mysqli_query($con, $query)) {
+        $response = array("error_product_detail_reviews" => "000");
+        echo json_encode($response);
+    } else {
+        $response = array("error_product_detail_reviews" => "111");
+        echo json_encode($response);
+    }
+}
+
+
+function get_product_by_id_reviews()
+{
+    global $con;
+
+    $product_id = $_POST["product_id"];
+
+    $query = "SELECT content, rating, user_name, comment_date FROM reviews WHERE product_id = '$product_id' ORDER BY review_id DESC";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $products[] = $row;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("error_product_by_id_reviews" => "111");
+        echo json_encode($response);
+    }
+}
+
+
+function get_product_by_id_review_rating_sum()
+{
+    global $con;
+
+    $product_id = $_POST["product_id"];
+
+    $query = "SELECT
+                rating_start1,
+                rating_start2,
+                rating_start3,
+                rating_start4,
+                rating_start5,
+                rating_start1 + rating_start2 + rating_start3 + rating_start4 + rating_start5 AS rating_sum,
+                ROUND((1 * rating_start1 + 2 * rating_start2 + 3 * rating_start3 + 4 * rating_start4 + 5 * rating_start5) / 
+                (rating_start1 + rating_start2 + rating_start3 + rating_start4 + rating_start5), 4) AS rating_review_overall
+            FROM
+                (SELECT 
+                    COUNT(CASE WHEN rating = 1 THEN rating END) AS rating_start1,
+                    COUNT(CASE WHEN rating = 2 THEN rating END) AS rating_start2,
+                    COUNT(CASE WHEN rating = 3 THEN rating END) AS rating_start3,
+                    COUNT(CASE WHEN rating = 4 THEN rating END) AS rating_start4,
+                    COUNT(CASE WHEN rating = 5 THEN rating END) AS rating_start5
+                FROM reviews
+                WHERE product_id = '$product_id'
+                GROUP BY product_id) AS subquery";
+
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+
+        // Rounding logic
+        $rating_review_overall = $row['rating_review_overall'];
+        if ($rating_review_overall < 0.4) {
+            $row['rating_review_overall'] = floor($rating_review_overall);
+        } else {
+            $row['rating_review_overall'] = ceil($rating_review_overall);
+        }
+
+        echo json_encode($row);
+    } else {
+        $response = array("error_product_by_id_reviews_rating_sum" => "111");
+        echo json_encode($response);
+    }
+}
+
+
 switch ($action) {
     case "register":
         register();
@@ -782,6 +881,18 @@ switch ($action) {
 
     case "get_product_by_id_specification":
         get_product_by_id_specification();
+        break;
+
+    case "add_product_detail_reviews":
+        add_product_detail_reviews();
+        break;
+
+    case "get_product_by_id_reviews":
+        get_product_by_id_reviews();
+        break;
+
+    case "get_product_by_id_review_rating_sum":
+        get_product_by_id_review_rating_sum();
         break;
 
     default :
