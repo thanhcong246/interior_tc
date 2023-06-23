@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,14 +18,21 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.vn.tcshop.foodapp.Adapters.Products.SliderAdapter;
 import com.vn.tcshop.foodapp.Apis.Images_Api;
+import com.vn.tcshop.foodapp.Apis.RetrofitApi;
+import com.vn.tcshop.foodapp.Configs.Constant;
 import com.vn.tcshop.foodapp.Fragments.DescriptionFragment;
 import com.vn.tcshop.foodapp.Fragments.ReviewFragment;
 import com.vn.tcshop.foodapp.Fragments.SpecificationFragment;
+import com.vn.tcshop.foodapp.Models.ProductReviewRatingSumOverAll;
 import com.vn.tcshop.foodapp.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
@@ -37,8 +45,13 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Runnable runnable;
     private TextView product_detail_descripton, product_detail_specification, product_detail_review;
     private TextView product_detail_id, product_id, product_detail_name, product_detail_price;
+    private TextView product_detail_old_price, product_detail_discount;
     private String[] imageUrls = {};
     private ImageView close_product_detail;
+    private Constant constant = new Constant();
+    private TextView reviews_product_detail;
+    private ImageView star1, star2, star3, star4, star5;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,14 @@ public class ProductDetailActivity extends AppCompatActivity {
         product_detail_name = findViewById(R.id.product_detail_name);
         product_detail_id = findViewById(R.id.product_detail_id);
         product_detail_price = findViewById(R.id.product_detail_price);
+        product_detail_discount = findViewById(R.id.product_detail_discount);
+        product_detail_old_price = findViewById(R.id.product_detail_old_price);
+        reviews_product_detail = findViewById(R.id.reviews_product_detail);
+        star1 = findViewById(R.id.star1);
+        star2 = findViewById(R.id.star2);
+        star3 = findViewById(R.id.star3);
+        star4 = findViewById(R.id.star4);
+        star5 = findViewById(R.id.star5);
         close_product_detail = findViewById(R.id.close_product_detail);
 
         // hiển thị fragment mặc định
@@ -62,7 +83,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         descriptionFragment.setArguments(bundle);
         // Hiển thị Fragment mặc định và truyền dữ liệu
         displayFragment(descriptionFragment);
-        product_detail_descripton.setTextColor(Color.parseColor("#36b0f9"));
+        product_detail_descripton.setTextColor(Color.parseColor("#000000"));
 
         onClickButtonDescripton();
         onClickButtonSpecification();
@@ -89,7 +110,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         int productId_dt = getIntent().getIntExtra("productId", 0);
         int product_detail_id_dt = getIntent().getIntExtra("product_detail_id", 0);
         String product_name_dt = getIntent().getStringExtra("product_name");
-        int product_detail_price_dt = getIntent().getIntExtra("product_detail_price", 0);
+        String product_detail_price_dt = getIntent().getStringExtra("product_detail_price");
+        int product_detail_discount_dt = getIntent().getIntExtra("product_detail_discount", 0);
+        String product_detail_old_price_dt = getIntent().getStringExtra("product_detail_old_price");
         String img_url_one_dt = getIntent().getStringExtra("img_url_one");
         String img_url_two_dt = getIntent().getStringExtra("img_url_two");
         String img_url_three_dt = getIntent().getStringExtra("img_url_three");
@@ -104,7 +127,12 @@ public class ProductDetailActivity extends AppCompatActivity {
         product_id.setText(String.valueOf(productId_dt));
         product_detail_id.setText(String.valueOf(product_detail_id_dt));
         product_detail_name.setText(product_name_dt);
-        product_detail_price.setText(String.valueOf(product_detail_price_dt));
+        product_detail_price.setText(product_detail_price_dt + "đ");
+        product_detail_discount.setText(product_detail_discount_dt + "%");
+        product_detail_old_price.setText(product_detail_old_price_dt + "đ");
+
+        getProductReview(productId_dt);
+
         // ----------------
         viewPager = findViewById(R.id.viewPager);
         indicatorLayout = findViewById(R.id.indicatorLayout);
@@ -155,13 +183,60 @@ public class ProductDetailActivity extends AppCompatActivity {
         viewPager.setCurrentItem(currentPage, true);
     }
 
+    private void getProductReview(int productId) {
+        RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+        Call<ProductReviewRatingSumOverAll> call = retrofitApi.get_product_by_id_review_rating_sum(productId);
+        call.enqueue(new Callback<ProductReviewRatingSumOverAll>() {
+            @Override
+            public void onResponse(Call<ProductReviewRatingSumOverAll> call, Response<ProductReviewRatingSumOverAll> response) {
+                if (response.isSuccessful()) {
+                    ProductReviewRatingSumOverAll productReviewRatingSumOverAll = response.body();
+                    int rating_sum_dt = productReviewRatingSumOverAll.getRating_sum();
+                    int rating_review_overall_dt = productReviewRatingSumOverAll.getRating_review_overall();
+                    reviews_product_detail.setText(String.valueOf(rating_sum_dt));
+
+                    star1.setImageResource(R.drawable.ic_star_filled);
+                    star2.setImageResource(R.drawable.ic_star_filled);
+                    star3.setImageResource(R.drawable.ic_star_filled);
+                    star4.setImageResource(R.drawable.ic_star_filled);
+                    star5.setImageResource(R.drawable.ic_star_filled);
+
+                    Log.d("rating_review_overall_dt", String.valueOf(rating_review_overall_dt));
+
+                    // Thiết lập số lượng hình ảnh sao tương ứng với giá trị rating
+                    if (rating_review_overall_dt >= 1) {
+                        star1.setImageResource(R.drawable.ic_star_empty);
+                    }
+                    if (rating_review_overall_dt >= 2) {
+                        star2.setImageResource(R.drawable.ic_star_empty);
+                    }
+                    if (rating_review_overall_dt >= 3) {
+                        star3.setImageResource(R.drawable.ic_star_empty);
+                    }
+                    if (rating_review_overall_dt >= 4) {
+                        star4.setImageResource(R.drawable.ic_star_empty);
+                    }
+                    if (rating_review_overall_dt >= 5) {
+                        star5.setImageResource(R.drawable.ic_star_empty);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProductReviewRatingSumOverAll> call, Throwable t) {
+
+            }
+        });
+    }
+
+
     private void onClickButtonDescripton() {
         product_detail_descripton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                product_detail_descripton.setTextColor(Color.parseColor("#36b0f9"));
-                product_detail_specification.setTextColor(Color.parseColor("#000000"));
-                product_detail_review.setTextColor(Color.parseColor("#000000"));
+                product_detail_descripton.setTextColor(Color.parseColor("#000000"));
+                product_detail_specification.setTextColor(Color.parseColor("#969696"));
+                product_detail_review.setTextColor(Color.parseColor("#969696"));
                 int productId_dt = getIntent().getIntExtra("productId", 0);
                 DescriptionFragment descriptonFragment = new DescriptionFragment();
                 Bundle bundle = new Bundle();
@@ -177,9 +252,9 @@ public class ProductDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                product_detail_descripton.setTextColor(Color.parseColor("#000000"));
-                product_detail_specification.setTextColor(Color.parseColor("#36b0f9"));
-                product_detail_review.setTextColor(Color.parseColor("#000000"));
+                product_detail_descripton.setTextColor(Color.parseColor("#969696"));
+                product_detail_specification.setTextColor(Color.parseColor("#000000"));
+                product_detail_review.setTextColor(Color.parseColor("#969696"));
 
                 int productId_dt = getIntent().getIntExtra("productId", 0);
                 SpecificationFragment specificationFragment = new SpecificationFragment();
@@ -196,9 +271,9 @@ public class ProductDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                product_detail_descripton.setTextColor(Color.parseColor("#000000"));
-                product_detail_specification.setTextColor(Color.parseColor("#000000"));
-                product_detail_review.setTextColor(Color.parseColor("#36b0f9"));
+                product_detail_descripton.setTextColor(Color.parseColor("#969696"));
+                product_detail_specification.setTextColor(Color.parseColor("#969696"));
+                product_detail_review.setTextColor(Color.parseColor("#000000"));
 
                 int productId_dt = getIntent().getIntExtra("productId", 0);
                 ReviewFragment reviewFragment = new ReviewFragment();

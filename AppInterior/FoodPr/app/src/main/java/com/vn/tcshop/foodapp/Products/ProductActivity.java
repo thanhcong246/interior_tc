@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -21,10 +22,12 @@ import com.vn.tcshop.foodapp.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Configs.Constant;
 import com.vn.tcshop.foodapp.HomeActivity;
 import com.vn.tcshop.foodapp.Models.Product;
+import com.vn.tcshop.foodapp.Models.ProductReviewRatingSumOverAll;
 import com.vn.tcshop.foodapp.Models.Product_detail;
 import com.vn.tcshop.foodapp.R;
 import com.vn.tcshop.foodapp.Settings.SettingActivity;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -76,22 +79,32 @@ public class ProductActivity extends AppCompatActivity {
                             int product_id_dt = product_detail.getProduct_id();
                             int product_detail_id_dt = product_detail.getProduct_detail_id();
                             String product_name_dt = product_detail.getName();
+                            int product_detail_discount_dt = product_detail.getDiscount();
+                            int product_detail_old_price_dt = product_detail.getOld_price();
                             int product_detail_price_dt = product_detail.getPrice();
                             String img_url_one_dt = product_detail.getImg_url_one();
                             String img_url_two_dt = product_detail.getImg_url_two();
                             String img_url_three_dt = product_detail.getImg_url_three();
                             String img_url_four_dt = product_detail.getImg_url_four();
 
+                            // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
+                            DecimalFormat decimalFormat = new DecimalFormat("#,###");
+                            String priceFormatted = decimalFormat.format(product_detail_price_dt);
+                            String oldPriceFormatted = decimalFormat.format(product_detail_old_price_dt);
+
                             //Chuyển sang trang chi tiết sản phẩm với ID của sản phẩm được nhấp
                             Intent intent = new Intent(ProductActivity.this, ProductDetailActivity.class);
                             intent.putExtra("productId", product_id_dt);
                             intent.putExtra("product_detail_id", product_detail_id_dt);
                             intent.putExtra("product_name", product_name_dt);
-                            intent.putExtra("product_detail_price", product_detail_price_dt);
+                            intent.putExtra("product_detail_price", priceFormatted);
+                            intent.putExtra("product_detail_discount", product_detail_discount_dt);
+                            intent.putExtra("product_detail_old_price", oldPriceFormatted);
                             intent.putExtra("img_url_one", img_url_one_dt);
                             intent.putExtra("img_url_two", img_url_two_dt);
                             intent.putExtra("img_url_three", img_url_three_dt);
                             intent.putExtra("img_url_four", img_url_four_dt);
+
                             startActivity(intent);
                         } else {
                             // Xử lý khi không có dữ liệu hoặc lỗi trong phản hồi từ API

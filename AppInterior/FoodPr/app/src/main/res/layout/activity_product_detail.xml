@@ -143,11 +143,20 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/reviews_product_detail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:paddingStart="10dp"
-                        android:text="99999 Đánh giá"
+                        android:text="99999"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="2dp"
+                        android:text="Đánh giá"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -163,7 +172,7 @@
                         android:background="#000000" />
 
                     <TextView
-                        android:id="@+id/product_detail_sum_ratting"
+                        android:id="@+id/product_detail_discount"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
@@ -182,6 +191,24 @@
                     android:textColor="#000000"
                     android:textSize="15sp"
                     android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:background="#2D000000"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp">
+
+                    <TextView
+                        android:id="@+id/product_detail_old_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100,000,000đ"
+                        android:textColor="#74000000"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -268,7 +295,7 @@
                 android:paddingBottom="7dp"
                 android:text="Thông số"
                 android:textAllCaps="false"
-                android:textColor="#000000"
+                android:textColor="#969696"
                 android:textSize="16dp"
                 android:textStyle="bold" />
 
@@ -285,7 +312,7 @@
                 android:paddingBottom="7dp"
                 android:text="Đánh giá"
                 android:textAllCaps="false"
-                android:textColor="#000000"
+                android:textColor="#969696"
                 android:textSize="16dp"
                 android:textStyle="bold" />
         </LinearLayout>

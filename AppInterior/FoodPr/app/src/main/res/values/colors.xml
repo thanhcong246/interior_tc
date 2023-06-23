@@ -4,5 +4,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bottom_nav_item_unselected">#919191</color> <!-- Màu khi mục chưa được chọn -->
     <color name="bottom_nav_item_selected">#000000</color> <!-- Màu khi mục được chọn -->
-
+    <color name="start1">#d9534f</color>
+    <color name="start2">#f0ad4e</color>
+    <color name="start3">#5bc0de</color>
+    <color name="start4">#428bca</color>
+    <color name="start5">#5cb85c</color>
+    <color name="start0">#d0cfd1</color>
+    <color name="transparent">#4C000000</color>
 </resources>

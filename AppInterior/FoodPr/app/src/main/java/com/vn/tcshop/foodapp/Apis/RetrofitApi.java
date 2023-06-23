@@ -1,8 +1,12 @@
 package com.vn.tcshop.foodapp.Apis;
 
 import com.vn.tcshop.foodapp.Models.Product;
+import com.vn.tcshop.foodapp.Models.ProductReviewRatingSumOverAll;
+import com.vn.tcshop.foodapp.Models.ProductReviews;
 import com.vn.tcshop.foodapp.Models.Product_detail;
 import com.vn.tcshop.foodapp.Models.Product_detail_desc;
+import com.vn.tcshop.foodapp.Models.Product_detail_reviews;
+import com.vn.tcshop.foodapp.Models.Product_detail_specifications;
 import com.vn.tcshop.foodapp.Responses.LoginResponse;
 import com.vn.tcshop.foodapp.Responses.RecoverCodePesponse;
 import com.vn.tcshop.foodapp.Responses.RecoverCodeToPesponse;
@@ -77,7 +81,28 @@ public interface RetrofitApi {
 
     @FormUrlEncoded
     @POST("get_product_by_id_specification")
-    Call<List<Product_detail_desc>> get_product_by_id_specification(
+    Call<List<Product_detail_specifications>> get_product_by_id_specification(
+            @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
+    @POST("add_product_detail_reviews")
+    Call<Product_detail_reviews> add_product_detail_reviews(
+            @Field("product_id") int product_id,
+            @Field("content") String content,
+            @Field("rating") int rating,
+            @Field("user_name") String user_name
+    );
+
+    @FormUrlEncoded
+    @POST("get_product_by_id_reviews")
+    Call<List<ProductReviews>> get_product_by_id_reviews(
+            @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
+    @POST("get_product_by_id_review_rating_sum")
+    Call<ProductReviewRatingSumOverAll> get_product_by_id_review_rating_sum(
             @Field("product_id") int product_id
     );
 }

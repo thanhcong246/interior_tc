@@ -2,6 +2,7 @@ package com.vn.tcshop.foodapp.Models;
 
 public class Product_detail_specifications {
     private String width;
+    private String length;
     private String height;
     private String number_of_drawers;
     private String type;
@@ -12,6 +13,14 @@ public class Product_detail_specifications {
 
     public void setWidth(String width) {
         this.width = width;
+    }
+
+    public String getLength() {
+        return length;
+    }
+
+    public void setLength(String length) {
+        this.length = length;
     }
 
     public String getHeight() {

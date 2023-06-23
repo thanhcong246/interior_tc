@@ -3,15 +3,19 @@ package com.vn.tcshop.foodapp.Models;
 public class Product_detail {
     private int product_id;
     private String name;
+    private int old_price;
+    private int discount;
     private int price;
     private int product_detail_id;
     private String img_url_one, img_url_two,img_url_three,img_url_four;
 
     public Product_detail(){}
 
-    public Product_detail(int product_id, String name, int price, int product_detail_id, String img_url_one, String img_url_two, String img_url_three, String img_url_four) {
+    public Product_detail(int product_id, String name, int old_price, int discount, int price, int product_detail_id, String img_url_one, String img_url_two, String img_url_three, String img_url_four) {
         this.product_id = product_id;
         this.name = name;
+        this.old_price = old_price;
+        this.discount = discount;
         this.price = price;
         this.product_detail_id = product_detail_id;
         this.img_url_one = img_url_one;
@@ -34,6 +38,22 @@ public class Product_detail {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getOld_price() {
+        return old_price;
+    }
+
+    public void setOld_price(int old_price) {
+        this.old_price = old_price;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
     }
 
     public int getPrice() {

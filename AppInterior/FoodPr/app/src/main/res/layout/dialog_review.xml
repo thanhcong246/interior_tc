@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <RatingBar
+        android:id="@+id/ratingBar_item_review"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="1" />
+
+    <EditText
+        android:id="@+id/editTextComment_item_review"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập bình luận của bạn"
+        android:inputType="text"
+        android:maxLines="1" />
+
+    <Button
+        android:id="@+id/buttonSubmit_item_review"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="Đánh giá"
+        android:textStyle="bold" />
+
+</LinearLayout>

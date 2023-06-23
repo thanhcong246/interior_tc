@@ -51,7 +51,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         // Sử dụng Picasso để tải ảnh từ URL vào ImageView
         String imageUrl = Images_Api.getImageUrl(product.getImage());
         Picasso.get().load(imageUrl).into(holder.productImageView);
-        Log.d("imgurl", imageUrl);
+//        Log.d("imgurl", imageUrl);
     }
 
     @Override
