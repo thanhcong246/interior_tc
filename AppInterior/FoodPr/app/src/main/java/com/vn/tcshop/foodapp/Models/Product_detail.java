@@ -4,17 +4,20 @@ public class Product_detail {
     private int product_id;
     private String name;
     private int old_price;
+    private String image_url;
     private int discount;
     private int price;
     private int product_detail_id;
-    private String img_url_one, img_url_two,img_url_three,img_url_four;
+    private String img_url_one, img_url_two, img_url_three, img_url_four;
 
-    public Product_detail(){}
+    public Product_detail() {
+    }
 
-    public Product_detail(int product_id, String name, int old_price, int discount, int price, int product_detail_id, String img_url_one, String img_url_two, String img_url_three, String img_url_four) {
+    public Product_detail(int product_id, String name, int old_price, String image_url, int discount, int price, int product_detail_id, String img_url_one, String img_url_two, String img_url_three, String img_url_four) {
         this.product_id = product_id;
         this.name = name;
         this.old_price = old_price;
+        this.image_url = image_url;
         this.discount = discount;
         this.price = price;
         this.product_detail_id = product_detail_id;
@@ -46,6 +49,14 @@ public class Product_detail {
 
     public void setOld_price(int old_price) {
         this.old_price = old_price;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
     public int getDiscount() {

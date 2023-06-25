@@ -11,7 +11,7 @@ public class Constant {
     Gson gson = new GsonBuilder().setLenient().create();
 
     public Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://192.168.1.2:86/interior_app/RetrofitPhpApi.php/")
+            .baseUrl("http://192.168.1.4:86/interior_app/RetrofitPhpApi.php/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build();
 }

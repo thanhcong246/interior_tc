@@ -6,10 +6,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +46,9 @@ public class ProductActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ProductAdapter adapter;
     private Constant constant = new Constant();
+    private SharedPreferences sharedPreferences;
+    private TextView notification_product_cart;
+    private RelativeLayout relativelayout_1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,18 @@ public class ProductActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottom_navigation_bar);
         recyclerView = findViewById(R.id.recyclerView);
+        relativelayout_1 = findViewById(R.id.relativelayout_1);
+        notification_product_cart = findViewById(R.id.notification_product_cart);
+
+        // hiển thị thông báo product
+        sharedPreferences = getSharedPreferences("notification_quantity_product", Context.MODE_PRIVATE);
+        int savedTotalQuantity = sharedPreferences.getInt("total_quantity_product", 0);
+        if (savedTotalQuantity == 0) {
+            relativelayout_1.setVisibility(View.GONE);
+        } else {
+            relativelayout_1.setVisibility(View.VISIBLE);
+            notification_product_cart.setText(String.valueOf(savedTotalQuantity));
+        }
 
 
         // Khởi tạo adapter và thiết lập RecyclerView
@@ -80,6 +99,7 @@ public class ProductActivity extends AppCompatActivity {
                             int product_detail_id_dt = product_detail.getProduct_detail_id();
                             String product_name_dt = product_detail.getName();
                             int product_detail_discount_dt = product_detail.getDiscount();
+                            String image_url_dt = product_detail.getImage_url();
                             int product_detail_old_price_dt = product_detail.getOld_price();
                             int product_detail_price_dt = product_detail.getPrice();
                             String img_url_one_dt = product_detail.getImg_url_one();
@@ -99,6 +119,7 @@ public class ProductActivity extends AppCompatActivity {
                             intent.putExtra("product_name", product_name_dt);
                             intent.putExtra("product_detail_price", priceFormatted);
                             intent.putExtra("product_detail_discount", product_detail_discount_dt);
+                            intent.putExtra("image_url", image_url_dt);
                             intent.putExtra("product_detail_old_price", oldPriceFormatted);
                             intent.putExtra("img_url_one", img_url_one_dt);
                             intent.putExtra("img_url_two", img_url_two_dt);
@@ -162,7 +183,6 @@ public class ProductActivity extends AppCompatActivity {
                         return true;
                     case "Giỏ hàng":
                         startActivity(new Intent(ProductActivity.this, CartActivity.class));
-                        overridePendingTransition(0, 0);
                         return true;
                     case "Cài đặt":
                         startActivity(new Intent(ProductActivity.this, SettingActivity.class));

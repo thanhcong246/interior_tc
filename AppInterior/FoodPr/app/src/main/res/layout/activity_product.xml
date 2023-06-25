@@ -39,6 +39,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/relativelayout_1"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_alignParentEnd="true"
@@ -47,6 +48,7 @@
             android:background="@drawable/bg_home_notification">
 
             <TextView
+                android:id="@+id/notification_product_cart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"

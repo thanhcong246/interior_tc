@@ -1,5 +1,7 @@
 package com.vn.tcshop.foodapp.Apis;
 
+import com.vn.tcshop.foodapp.Models.Cart;
+import com.vn.tcshop.foodapp.Models.CartByPayment;
 import com.vn.tcshop.foodapp.Models.Product;
 import com.vn.tcshop.foodapp.Models.ProductReviewRatingSumOverAll;
 import com.vn.tcshop.foodapp.Models.ProductReviews;
@@ -7,6 +9,10 @@ import com.vn.tcshop.foodapp.Models.Product_detail;
 import com.vn.tcshop.foodapp.Models.Product_detail_desc;
 import com.vn.tcshop.foodapp.Models.Product_detail_reviews;
 import com.vn.tcshop.foodapp.Models.Product_detail_specifications;
+import com.vn.tcshop.foodapp.Responses.CartByIdResponse;
+import com.vn.tcshop.foodapp.Responses.CartDeleteAllResponse;
+import com.vn.tcshop.foodapp.Responses.CartRemoveProductId;
+import com.vn.tcshop.foodapp.Responses.CartRemoveProductIdAll;
 import com.vn.tcshop.foodapp.Responses.LoginResponse;
 import com.vn.tcshop.foodapp.Responses.RecoverCodePesponse;
 import com.vn.tcshop.foodapp.Responses.RecoverCodeToPesponse;
@@ -105,4 +111,47 @@ public interface RetrofitApi {
     Call<ProductReviewRatingSumOverAll> get_product_by_id_review_rating_sum(
             @Field("product_id") int product_id
     );
+
+    @FormUrlEncoded
+    @POST("add_cart_by_id")
+    Call<CartByIdResponse> add_cart_by_id(
+            @Field("product_id") int product_id,
+            @Field("email") String email,
+            @Field("price") int price,
+            @Field("cart_name") String cart_name,
+            @Field("cart_img") String cart_img
+    );
+
+    @FormUrlEncoded
+    @POST("get_cart_by_id")
+    Call<List<Cart>> get_cart_by_id(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("total_price_and_quantity_cart_by_id")
+    Call<CartByPayment> total_price_and_quantity_cart_by_id(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("delete_all_cart")
+    Call<CartDeleteAllResponse> delete_all_cart(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("delete_cart_by_id_all")
+    Call<CartRemoveProductIdAll> delete_cart_by_id_all(
+            @Field("email") String email,
+            @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
+    @POST("delete_cart_by_id")
+    Call<CartRemoveProductId> delete_cart_by_id(
+            @Field("email") String email,
+            @Field("product_id") int product_id
+    );
+
 }

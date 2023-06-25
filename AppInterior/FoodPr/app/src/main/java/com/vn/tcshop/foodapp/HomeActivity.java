@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private MenuFragment fragmentMenu;
     private ImageView menuButton;
+    private SharedPreferences sharedPreferences;
+    private TextView notification_product_cart;
+    private RelativeLayout relativelayout_1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +40,20 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation_bar);
-
         fragmentMenu = new MenuFragment();
-
         menuButton = findViewById(R.id.home_menu_btn);
+        relativelayout_1 = findViewById(R.id.relativelayout_1);
+        notification_product_cart = findViewById(R.id.notification_product_cart);
 
+        // hiển thị thông báo product
+        sharedPreferences = getSharedPreferences("notification_quantity_product", Context.MODE_PRIVATE);
+        int savedTotalQuantity = sharedPreferences.getInt("total_quantity_product", 0);
+        if (savedTotalQuantity == 0) {
+            relativelayout_1.setVisibility(View.GONE);
+        } else {
+            relativelayout_1.setVisibility(View.VISIBLE);
+            notification_product_cart.setText(String.valueOf(savedTotalQuantity));
+        }
         bottomNavigationView();
         // Hiển thị Fragment Menu
         displayFragmentMenu();
@@ -77,7 +90,6 @@ public class HomeActivity extends AppCompatActivity {
                         return true;
                     case "Giỏ hàng":
                         startActivity(new Intent(HomeActivity.this, CartActivity.class));
-                        overridePendingTransition(0, 0);
                         return true;
                     case "Cài đặt":
                         startActivity(new Intent(HomeActivity.this, SettingActivity.class));

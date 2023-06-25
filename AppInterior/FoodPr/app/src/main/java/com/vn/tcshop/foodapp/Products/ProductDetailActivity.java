@@ -1,16 +1,22 @@
 package com.vn.tcshop.foodapp.Products;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StrikethroughSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -23,12 +29,16 @@ import com.vn.tcshop.foodapp.Configs.Constant;
 import com.vn.tcshop.foodapp.Fragments.DescriptionFragment;
 import com.vn.tcshop.foodapp.Fragments.ReviewFragment;
 import com.vn.tcshop.foodapp.Fragments.SpecificationFragment;
+import com.vn.tcshop.foodapp.Models.CartByPayment;
 import com.vn.tcshop.foodapp.Models.ProductReviewRatingSumOverAll;
 import com.vn.tcshop.foodapp.R;
+import com.vn.tcshop.foodapp.Responses.CartByIdResponse;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,6 +61,11 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Constant constant = new Constant();
     private TextView reviews_product_detail;
     private ImageView star1, star2, star3, star4, star5;
+    private ImageView btn_add_cart;
+    private SharedPreferences sharedPreferences;
+    private static final String SHARED_PREFS_NAME = "login_prefs";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_REMEMBER_ME = "remember_me";
 
 
     @Override
@@ -74,6 +89,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         star4 = findViewById(R.id.star4);
         star5 = findViewById(R.id.star5);
         close_product_detail = findViewById(R.id.close_product_detail);
+        btn_add_cart = findViewById(R.id.btn_add_cart);
 
         // hiển thị fragment mặc định
         int productId_dt = getIntent().getIntExtra("productId", 0);
@@ -88,10 +104,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         onClickButtonDescripton();
         onClickButtonSpecification();
         onClickButtonReview();
-
         get_product_detail();
-
         close_product_detail_btn();
+
 
     }
 
@@ -113,6 +128,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         String product_detail_price_dt = getIntent().getStringExtra("product_detail_price");
         int product_detail_discount_dt = getIntent().getIntExtra("product_detail_discount", 0);
         String product_detail_old_price_dt = getIntent().getStringExtra("product_detail_old_price");
+        String image_url_dt = getIntent().getStringExtra("image_url");
         String img_url_one_dt = getIntent().getStringExtra("img_url_one");
         String img_url_two_dt = getIntent().getStringExtra("img_url_two");
         String img_url_three_dt = getIntent().getStringExtra("img_url_three");
@@ -129,9 +145,22 @@ public class ProductDetailActivity extends AppCompatActivity {
         product_detail_name.setText(product_name_dt);
         product_detail_price.setText(product_detail_price_dt + "đ");
         product_detail_discount.setText(product_detail_discount_dt + "%");
-        product_detail_old_price.setText(product_detail_old_price_dt + "đ");
+
+        String currencySymbol = "đ";
+        String text = product_detail_old_price_dt + currencySymbol;
+
+        SpannableString spannableString = new SpannableString(text);
+        int end = text.length() - currencySymbol.length();
+        spannableString.setSpan(new StrikethroughSpan(), 0, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        product_detail_old_price.setText(spannableString);
 
         getProductReview(productId_dt);
+
+        sharedPreferences = getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        if (sharedPreferences.getBoolean(KEY_REMEMBER_ME, false)) {
+            String saveEmail = sharedPreferences.getString(KEY_EMAIL, "");
+            addCartById(productId_dt, saveEmail, product_detail_price_dt, product_name_dt, image_url_dt);
+        }
 
         // ----------------
         viewPager = findViewById(R.id.viewPager);
@@ -173,6 +202,63 @@ public class ProductDetailActivity extends AppCompatActivity {
         // -----------
     }
 
+    private void addCartById(int productId_dt, String saveEmail, String product_detail_price_dt_cart, String product_name_dt, String image_url_dt) {
+        btn_add_cart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String cleanInput = product_detail_price_dt_cart.replaceAll(",", "");
+                int price_cart = Integer.parseInt(cleanInput);
+                RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+                Call<CartByIdResponse> call = retrofitApi.add_cart_by_id(productId_dt, saveEmail, price_cart, product_name_dt, image_url_dt);
+                call.enqueue(new Callback<CartByIdResponse>() {
+                    @Override
+                    public void onResponse(Call<CartByIdResponse> call, Response<CartByIdResponse> response) {
+                        if (response.isSuccessful()) {
+                            CartByIdResponse cartByIdResponse = response.body();
+                            String error_cart_add = cartByIdResponse.getError_cart_add();
+                            if (Objects.equals(error_cart_add, "000")) {
+                                Toast.makeText(ProductDetailActivity.this, "Đã thêm sản phẩm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                                getTotalCartPayment(saveEmail);
+                            }
+                            if (Objects.equals(error_cart_add, "111")) {
+                                Log.e("error_cart_add", "111");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CartByIdResponse> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+    }
+
+    private void getTotalCartPayment(String savedEmail) {
+        SharedPreferences saveQuantityProduct = getSharedPreferences("notification_quantity_product", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = saveQuantityProduct.edit();
+        RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+        Call<CartByPayment> call = retrofitApi.total_price_and_quantity_cart_by_id(savedEmail);
+        call.enqueue(new Callback<CartByPayment>() {
+            @Override
+            public void onResponse(Call<CartByPayment> call, Response<CartByPayment> response) {
+                if (response.isSuccessful()) {
+                    CartByPayment cartByPayment = response.body();
+                    int total_quantity = cartByPayment.getTotal_quantity();
+                    // lưu thông tin thông báo product
+                    editor.putInt("total_quantity_product", total_quantity);
+                    editor.apply();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CartByPayment> call, Throwable t) {
+
+            }
+        });
+    }
+
     // quay lại trang slider đầu khi mà chạy hết
     private void reverseSlider() {
         if (currentPage == 0) {
@@ -200,8 +286,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                     star3.setImageResource(R.drawable.ic_star_filled);
                     star4.setImageResource(R.drawable.ic_star_filled);
                     star5.setImageResource(R.drawable.ic_star_filled);
-
-                    Log.d("rating_review_overall_dt", String.valueOf(rating_review_overall_dt));
 
                     // Thiết lập số lượng hình ảnh sao tương ứng với giá trị rating
                     if (rating_review_overall_dt >= 1) {
