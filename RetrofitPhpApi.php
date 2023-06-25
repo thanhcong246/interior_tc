@@ -403,7 +403,7 @@ function get_product_by_id()
 
     $product_id = $_POST["product_id"];
 
-    $query = "SELECT Products.product_id, Products.name, Products.old_price, Products.discount, CAST(Products.old_price - (Products.old_price * Products.discount / 100) AS INT) AS price, Product_Details.img_url_one, Product_Details.img_url_two, Product_Details.img_url_three, Product_Details.img_url_four
+    $query = "SELECT Products.product_id, Products.name, Products.old_price, Products.image_url, Products.discount, CAST(Products.old_price - (Products.old_price * Products.discount / 100) AS INT) AS price, Product_Details.img_url_one, Product_Details.img_url_two, Product_Details.img_url_three, Product_Details.img_url_four
               FROM Products
               LEFT JOIN product_details ON Products.product_id = product_details.product_id
               WHERE Products.product_id = '$product_id'";
@@ -805,6 +805,163 @@ function get_product_by_id_review_rating_sum()
     }
 }
 
+function add_cart_by_id()
+{
+
+    global $con;
+
+    $product_id = $_POST["product_id"];
+    $email = $_POST["email"];
+    $price = $_POST["price"];
+    $cart_name = $_POST["cart_name"];
+    $cart_img = $_POST["cart_img"];
+
+
+    $query = "INSERT INTO carts (product_id, email, price, cart_name, cart_img) 
+              VALUES ('$product_id', '$email', '$price', '$cart_name', '$cart_img')";
+
+    if (mysqli_query($con, $query)) {
+        $response = array("error_cart_add" => "000");
+        echo json_encode($response);
+    } else {
+        $response = array("error_cart_add" => "111");
+        echo json_encode($response);
+    }
+
+}
+
+function get_cart_by_id()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $query = "SELECT * FROM carts WHERE email = '$email'";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+        $product_ids = array(); // Mảng lưu trữ product_id đã xuất hiện
+        $quantity_product_id = array(); // Mảng lưu trữ số lần xuất hiện của từng product_id
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product_id = $row["product_id"];
+
+            // Kiểm tra xem product_id đã tồn tại trong mảng kết hợp chưa
+            if (!in_array($product_id, $product_ids)) {
+                $product = array(
+                    "product_id" => $product_id,
+                    "email" => $row["email"],
+                    "price" => $row["price"],
+                    "cart_name" => $row["cart_name"],
+                    "cart_img" => $row["cart_img"]
+                );
+                $products[] = $product;
+
+                // Đánh dấu product_id đã xuất hiện
+                $product_ids[] = $product_id;
+            }
+
+            // Tăng số lần xuất hiện của product_id
+            if (isset($quantity_product_id[$product_id])) {
+                $quantity_product_id[$product_id]++;
+            } else {
+                $quantity_product_id[$product_id] = 1;
+            }
+        }
+
+        // Thêm quantity_product_id và sum_product_id_price vào mỗi sản phẩm trong mảng $products
+        foreach ($products as &$product) {
+            $product_id = $product["product_id"];
+            $quantity = $quantity_product_id[$product_id];
+            $product["quantity_product_id"] = $quantity;
+            $product["sum_product_id_price"] = $product["price"] * $quantity;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("error_get_cart" => "111");
+        echo json_encode($response);
+    }
+}
+
+function total_price_and_quantity_cart_by_id()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $query = "SELECT product_id, COUNT(DISTINCT product_id) AS total_quantity, SUM(price) AS total_price
+              FROM carts 
+              WHERE email = '$email' 
+              GROUP BY product_id";
+    $result = mysqli_query($con, $query);
+
+    $total_price = 0;
+    $total_quantity = 0;
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $total_price += $row["total_price"];
+        $total_quantity += $row["total_quantity"];
+    }
+
+    $total_payment = $total_price + 220000;
+
+    $response = array("transportation_costs" => 220000, "total_price" => $total_price, "total_quantity" => $total_quantity, "total_payment" => $total_payment);
+    echo json_encode($response);
+}
+
+function delete_cart_by_id()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $product_id = $_POST["product_id"];
+    $query = "DELETE FROM carts WHERE email = '$email' AND product_id = '$product_id' LIMIT 1";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $response = array("error_remove_cart_by_id" => "000");
+    } else {
+        $response = array("error_remove_cart_by_id" => "111");
+    }
+
+    echo json_encode($response);
+}
+
+function delete_cart_by_id_all()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $product_id = $_POST["product_id"];
+    $query = "DELETE FROM carts WHERE email = '$email' AND product_id = '$product_id'";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $response = array("error_remove_cart_by_id_all" => "000");
+    } else {
+        $response = array("error_remove_cart_by_id_all" => "111");
+    }
+
+    echo json_encode($response);
+}
+
+function delete_all_cart()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $query = "DELETE FROM carts WHERE email = '$email'";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $response = array("error_all_cart_by_product_id" => "000");
+    } else {
+        $response = array("error_all_cart_by_product_id" => "111");
+    }
+
+    echo json_encode($response);
+}
+
 
 switch ($action) {
     case "register":
@@ -893,6 +1050,30 @@ switch ($action) {
 
     case "get_product_by_id_review_rating_sum":
         get_product_by_id_review_rating_sum();
+        break;
+
+    case "add_cart_by_id":
+        add_cart_by_id();
+        break;
+
+    case "get_cart_by_id":
+        get_cart_by_id();
+        break;
+
+    case "total_price_and_quantity_cart_by_id":
+        total_price_and_quantity_cart_by_id();
+        break;
+
+    case "delete_cart_by_id":
+        delete_cart_by_id();
+        break;
+
+    case "delete_cart_by_id_all":
+        delete_cart_by_id_all();
+        break;
+
+    case "delete_all_cart":
+        delete_all_cart();
         break;
 
     default :
