@@ -1,6 +1,5 @@
 package com.vn.tcshop.foodapp.Adapters.Products;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.vn.tcshop.foodapp.Apis.Images_Api;
+import com.vn.tcshop.foodapp.Retrofits.Apis.Images_Api;
 import com.vn.tcshop.foodapp.Models.Product;
 import com.vn.tcshop.foodapp.R;
 

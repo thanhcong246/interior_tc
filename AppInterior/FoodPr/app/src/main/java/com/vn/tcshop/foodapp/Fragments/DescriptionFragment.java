@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.vn.tcshop.foodapp.Apis.RetrofitApi;
-import com.vn.tcshop.foodapp.Configs.Constant;
+import com.vn.tcshop.foodapp.Retrofits.Apis.RetrofitApi;
+import com.vn.tcshop.foodapp.Retrofits.Configs.Constant;
 import com.vn.tcshop.foodapp.Models.Product_detail_desc;
 import com.vn.tcshop.foodapp.R;
 

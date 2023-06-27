@@ -16,37 +16,40 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Products.ProductDetailActivity"
+            android:name=".Activitis.Carts.DetailCartActivity"
             android:exported="false" />
         <activity
-            android:name=".Settings.SettingActivity"
+            android:name=".Activitis.Products.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".Products.ProductActivity"
+            android:name=".Activitis.Settings.SettingActivity"
             android:exported="false" />
         <activity
-            android:name=".Carts.CartActivity"
+            android:name=".Activitis.Products.ProductActivity"
             android:exported="false" />
         <activity
-            android:name=".Accounts.RecoverEmailActivity"
+            android:name=".Activitis.Carts.CartActivity"
             android:exported="false" />
         <activity
-            android:name=".Accounts.RecoverCodeActivity"
+            android:name=".Activitis.Accounts.RecoverEmailActivity"
             android:exported="false" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".Activitis.Accounts.RecoverCodeActivity"
             android:exported="false" />
         <activity
-            android:name=".Accounts.RecoverActivity"
+            android:name=".Activitis.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activitis.Accounts.RecoverActivity"
             android:exported="true" />
         <activity
-            android:name=".Accounts.RegisterActivity"
+            android:name=".Activitis.Accounts.RegisterActivity"
             android:exported="true" />
         <activity
-            android:name=".Accounts.LoginActivity"
+            android:name=".Activitis.Accounts.LoginActivity"
             android:exported="true" />
         <activity
-            android:name=".Animation_main"
+            android:name=".Activitis.Animation_main"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,7 +58,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".Activitis.MainActivity"
             android:exported="true" />
     </application>
 

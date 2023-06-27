@@ -10,8 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.vn.tcshop.foodapp.Apis.Images_Api;
-import com.vn.tcshop.foodapp.Configs.Constant;
+import com.vn.tcshop.foodapp.Retrofits.Apis.Images_Api;
 import com.vn.tcshop.foodapp.Models.Cart;
 import com.vn.tcshop.foodapp.R;
 

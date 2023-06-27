@@ -12,29 +12,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.vn.tcshop.foodapp.Accounts.LoginActivity;
+import com.vn.tcshop.foodapp.Activitis.Accounts.LoginActivity;
 import com.vn.tcshop.foodapp.Adapters.MenuAdapter;
-import com.vn.tcshop.foodapp.Carts.CartActivity;
-import com.vn.tcshop.foodapp.HomeActivity;
+import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Models.MenuItemModel;
-import com.vn.tcshop.foodapp.Products.ProductActivity;
+import com.vn.tcshop.foodapp.Activitis.Products.ProductActivity;
 import com.vn.tcshop.foodapp.R;
-import com.vn.tcshop.foodapp.Settings.SettingActivity;
-
-import org.w3c.dom.Text;
+import com.vn.tcshop.foodapp.Activitis.Settings.SettingActivity;
 
 import java.util.ArrayList;
 import java.util.List;
