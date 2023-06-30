@@ -242,6 +242,7 @@
 
 
                 <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_add_payment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"

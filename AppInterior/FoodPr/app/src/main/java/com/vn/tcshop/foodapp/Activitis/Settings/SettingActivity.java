@@ -16,6 +16,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Activitis.HomeActivity;
+import com.vn.tcshop.foodapp.Activitis.Products.CategorisActivity;
 import com.vn.tcshop.foodapp.Activitis.Products.ProductActivity;
 import com.vn.tcshop.foodapp.R;
 
@@ -79,7 +80,7 @@ public class SettingActivity extends AppCompatActivity {
                         overridePendingTransition(0, 0);
                         return true;
                     case "Sản phẩm":
-                        startActivity(new Intent(SettingActivity.this, ProductActivity.class));
+                        startActivity(new Intent(SettingActivity.this, CategorisActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case "Giỏ hàng":

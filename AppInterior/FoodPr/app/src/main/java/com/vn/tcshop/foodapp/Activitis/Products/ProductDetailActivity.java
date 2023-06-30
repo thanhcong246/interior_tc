@@ -13,6 +13,7 @@ import android.text.style.StrikethroughSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,6 +23,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
+import com.vn.tcshop.foodapp.Activitis.Carts.PaymentActivity;
 import com.vn.tcshop.foodapp.Adapters.Products.SliderAdapter;
 import com.vn.tcshop.foodapp.Retrofits.Apis.Images_Api;
 import com.vn.tcshop.foodapp.Retrofits.Apis.RetrofitApi;
@@ -55,6 +58,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private TextView product_detail_descripton, product_detail_specification, product_detail_review;
     private TextView product_detail_id, product_id, product_detail_name, product_detail_price;
     private TextView product_detail_old_price, product_detail_discount;
+    private Button btn_add_payment;
     private String[] imageUrls = {};
     private ImageView close_product_detail;
     private Constant constant = new Constant();
@@ -89,6 +93,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         star5 = findViewById(R.id.star5);
         close_product_detail = findViewById(R.id.close_product_detail);
         btn_add_cart = findViewById(R.id.btn_add_cart);
+        btn_add_payment = findViewById(R.id.btn_add_payment);
 
         // hiển thị fragment mặc định
         int productId_dt = getIntent().getIntExtra("productId", 0);
@@ -159,6 +164,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         if (sharedPreferences.getBoolean(KEY_REMEMBER_ME, false)) {
             String saveEmail = sharedPreferences.getString(KEY_EMAIL, "");
             addCartById(productId_dt, saveEmail, product_detail_price_dt, product_name_dt, image_url_dt);
+            addCartPayment(productId_dt, saveEmail, product_detail_price_dt, product_name_dt, image_url_dt);
         }
 
         // ----------------
@@ -199,6 +205,39 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         // -----------
+    }
+
+    private void addCartPayment(int productId_dt, String saveEmail, String product_detail_price_dt_cart, String product_name_dt, String image_url_dt) {
+        btn_add_payment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String cleanInput = product_detail_price_dt_cart.replaceAll(",", "");
+                int price_cart = Integer.parseInt(cleanInput);
+                RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+                Call<CartByIdResponse> call = retrofitApi.add_cart_payment_by_id(productId_dt, saveEmail, price_cart, product_name_dt, image_url_dt);
+                call.enqueue(new Callback<CartByIdResponse>() {
+                    @Override
+                    public void onResponse(Call<CartByIdResponse> call, Response<CartByIdResponse> response) {
+                        if (response.isSuccessful()) {
+                            CartByIdResponse cartByIdResponse = response.body();
+                            String error_cart_add = cartByIdResponse.getError_cart_add();
+                            if (Objects.equals(error_cart_add, "000")) {
+                                startActivity(new Intent(ProductDetailActivity.this, PaymentActivity.class));
+                                finish();
+                            }
+                            if (Objects.equals(error_cart_add, "111")) {
+                                Log.e("error_cart_add", "111");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CartByIdResponse> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
     }
 
     private void addCartById(int productId_dt, String saveEmail, String product_detail_price_dt_cart, String product_name_dt, String image_url_dt) {

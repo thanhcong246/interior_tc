@@ -16,6 +16,18 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".Activitis.Carts.PaymentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activitis.Products.ProductByCategoryIdActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activitis.Products.SearchProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activitis.Products.CategorisActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activitis.Carts.DetailCartActivity"
             android:exported="false" />
         <activity

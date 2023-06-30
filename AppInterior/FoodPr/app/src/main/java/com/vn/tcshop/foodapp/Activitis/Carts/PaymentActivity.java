@@ -17,17 +17,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vn.tcshop.foodapp.Adapters.Carts.CartAdapter;
-import com.vn.tcshop.foodapp.Retrofits.Apis.RetrofitApi;
-import com.vn.tcshop.foodapp.Retrofits.Configs.Constant;
 import com.vn.tcshop.foodapp.Activitis.HomeActivity;
+import com.vn.tcshop.foodapp.Activitis.Products.CategorisActivity;
+import com.vn.tcshop.foodapp.Adapters.Carts.CartAdapter;
 import com.vn.tcshop.foodapp.Models.Cart;
 import com.vn.tcshop.foodapp.Models.CartByPayment;
-import com.vn.tcshop.foodapp.R;
 import com.vn.tcshop.foodapp.Models.Responses.CartByIdResponse;
 import com.vn.tcshop.foodapp.Models.Responses.CartDeleteAllResponse;
 import com.vn.tcshop.foodapp.Models.Responses.CartRemoveProductId;
 import com.vn.tcshop.foodapp.Models.Responses.CartRemoveProductIdAll;
+import com.vn.tcshop.foodapp.R;
+import com.vn.tcshop.foodapp.Retrofits.Apis.RetrofitApi;
+import com.vn.tcshop.foodapp.Retrofits.Configs.Constant;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CartActivity extends AppCompatActivity {
+public class PaymentActivity extends AppCompatActivity {
     private CartAdapter adapter;
     private RecyclerView recyclerView;
     private Constant constant = new Constant();
@@ -60,8 +61,7 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
-
+        setContentView(R.layout.activity_payment);
         recyclerView = findViewById(R.id.list_recyc_cart);
         btn_close_cart = findViewById(R.id.btn_close_cart);
         cartRelativeLayout_10000 = findViewById(R.id.cartRelativeLayout_10000);
@@ -88,9 +88,8 @@ public class CartActivity extends AppCompatActivity {
             deleteCartProductId(savedEmail);
             removerCartProductId(savedEmail);
             addCartProductId(savedEmail);
+            closeCart(savedEmail);
         }
-
-        closeCart();
         getCartDetail();
     }
 
@@ -98,8 +97,8 @@ public class CartActivity extends AppCompatActivity {
         proceed_to_checkout_cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(CartActivity.this,DetailCartActivity.class);
-                intent.putExtra("case",1);
+                Intent intent = new Intent(PaymentActivity.this, DetailCartActivity.class);
+                intent.putExtra("case", 2);
                 startActivity(intent);
             }
         });
@@ -115,7 +114,7 @@ public class CartActivity extends AppCompatActivity {
                 String cartImg = cart.getCart_img();
 
                 RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
-                Call<CartByIdResponse> call = retrofitApi.add_cart_by_id(cartProductId, savedEmail, cartPrice, cartName, cartImg);
+                Call<CartByIdResponse> call = retrofitApi.add_cart_payment_by_id(cartProductId, savedEmail, cartPrice, cartName, cartImg);
                 call.enqueue(new Callback<CartByIdResponse>() {
                     @Override
                     public void onResponse(Call<CartByIdResponse> call, Response<CartByIdResponse> response) {
@@ -144,7 +143,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onRemoveClick(int productId) {
                 RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
-                Call<CartRemoveProductId> call = retrofitApi.delete_cart_by_id(savedEmail, productId);
+                Call<CartRemoveProductId> call = retrofitApi.delete_cart_payment_by_id(savedEmail, productId);
                 call.enqueue(new Callback<CartRemoveProductId>() {
                     @Override
                     public void onResponse(Call<CartRemoveProductId> call, Response<CartRemoveProductId> response) {
@@ -172,7 +171,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onDeleteClick(int productId) {
                 RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
-                Call<CartRemoveProductIdAll> call = retrofitApi.delete_cart_by_id_all(savedEmail, productId);
+                Call<CartRemoveProductIdAll> call = retrofitApi.delete_cart_payment_by_id_all(savedEmail, productId);
                 call.enqueue(new Callback<CartRemoveProductIdAll>() {
                     @Override
                     public void onResponse(Call<CartRemoveProductIdAll> call, Response<CartRemoveProductIdAll> response) {
@@ -200,14 +199,14 @@ public class CartActivity extends AppCompatActivity {
         delete_all_cart_product_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(CartActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(PaymentActivity.this);
                 builder.setTitle("Thông báo"); // Tiêu đề của hộp thoại
-                builder.setMessage("Bạn có muốn xóa hết sản phẩm trong giỏ hàng?"); // Nội dung của hộp thoại
+                builder.setMessage("Bạn có muốn xóa hết sản phẩm?"); // Nội dung của hộp thoại
 
                 builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
-                        Call<CartDeleteAllResponse> call = retrofitApi.delete_all_cart(savedEmail);
+                        Call<CartDeleteAllResponse> call = retrofitApi.delete_all_cart_payment(savedEmail);
                         call.enqueue(new Callback<CartDeleteAllResponse>() {
                             @Override
                             public void onResponse(Call<CartDeleteAllResponse> call, Response<CartDeleteAllResponse> response) {
@@ -217,7 +216,7 @@ public class CartActivity extends AppCompatActivity {
                                     if (Objects.equals(error_all_cart_by_product_id, "000")) {
                                         getCarts(savedEmail);
                                         getTotalCartPayment(savedEmail);
-                                        Toast.makeText(getApplicationContext(), "Đã xóa hết sản phẩm trong giỏ hàng", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Đã xóa hết sản phẩm", Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
                                     }
                                 }
@@ -244,10 +243,8 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void getTotalCartPayment(String savedEmail) {
-        SharedPreferences saveQuantityProduct = getSharedPreferences("notification_quantity_product", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = saveQuantityProduct.edit();
         RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
-        Call<CartByPayment> call = retrofitApi.total_price_and_quantity_cart_by_id(savedEmail);
+        Call<CartByPayment> call = retrofitApi.total_price_and_quantity_cart_payment_by_id(savedEmail);
         call.enqueue(new Callback<CartByPayment>() {
             @Override
             public void onResponse(Call<CartByPayment> call, Response<CartByPayment> response) {
@@ -257,10 +254,6 @@ public class CartActivity extends AppCompatActivity {
                     int total_price = cartByPayment.getTotal_price();
                     int total_quantity = cartByPayment.getTotal_quantity();
                     int total_payment = cartByPayment.getTotal_payment();
-
-                    // lưu thông tin thông báo product
-                    editor.putInt("total_quantity_product", total_quantity);
-                    editor.apply();
 
                     // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
                     DecimalFormat decimalFormat = new DecimalFormat("#,###");
@@ -287,7 +280,7 @@ public class CartActivity extends AppCompatActivity {
         null_product.setVisibility(View.VISIBLE);
         constraintLayout_10000.setVisibility(View.GONE);
         RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
-        Call<List<Cart>> call = retrofitApi.get_cart_by_id(savedEmail);
+        Call<List<Cart>> call = retrofitApi.get_cart_payment_by_id(savedEmail);
         call.enqueue(new Callback<List<Cart>>() {
             @Override
             public void onResponse(Call<List<Cart>> call, Response<List<Cart>> response) {
@@ -310,12 +303,30 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
-    private void closeCart() {
+    private void closeCart(String savedEmail) {
         btn_close_cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(CartActivity.this, HomeActivity.class));
-                finish();
+                RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+                Call<CartDeleteAllResponse> call = retrofitApi.delete_all_cart_payment(savedEmail);
+                call.enqueue(new Callback<CartDeleteAllResponse>() {
+                    @Override
+                    public void onResponse(Call<CartDeleteAllResponse> call, Response<CartDeleteAllResponse> response) {
+                        if (response.isSuccessful()) {
+                            CartDeleteAllResponse cartDeleteAllResponse = response.body();
+                            String error_all_cart_by_product_id = cartDeleteAllResponse.getError_all_cart_by_product_id();
+                            if (Objects.equals(error_all_cart_by_product_id, "000")) {
+                                startActivity(new Intent(PaymentActivity.this, CategorisActivity.class));
+                                finish();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CartDeleteAllResponse> call, Throwable t) {
+
+                    }
+                });
             }
         });
     }

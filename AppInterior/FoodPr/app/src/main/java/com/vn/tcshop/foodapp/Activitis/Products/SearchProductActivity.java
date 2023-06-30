@@ -1,31 +1,22 @@
 package com.vn.tcshop.foodapp.Activitis.Products;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.vn.tcshop.foodapp.Adapters.Products.ProductAdapter;
-import com.vn.tcshop.foodapp.Retrofits.Apis.RetrofitApi;
-import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
-import com.vn.tcshop.foodapp.Retrofits.Configs.Constant;
-import com.vn.tcshop.foodapp.Activitis.HomeActivity;
 import com.vn.tcshop.foodapp.Models.Product;
 import com.vn.tcshop.foodapp.Models.Product_detail;
 import com.vn.tcshop.foodapp.R;
-import com.vn.tcshop.foodapp.Activitis.Settings.SettingActivity;
+import com.vn.tcshop.foodapp.Retrofits.Apis.RetrofitApi;
+import com.vn.tcshop.foodapp.Retrofits.Configs.Constant;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -35,39 +26,34 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
-public class ProductActivity extends AppCompatActivity {
+public class SearchProductActivity extends AppCompatActivity {
+    private View closeSearchProduct;
+    private RecyclerView recyclerView_product;
     private Constant constant = new Constant();
     private ProductAdapter adapter;
-    private RecyclerView recyclerView;
-    private View closeProduct;
+    private EditText edt_searchProduct;
+    private Button submit_searchProduct;
+    private TextView nullSearchProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product);
-
-        recyclerView = findViewById(R.id.recyclerView);
-        closeProduct = findViewById(R.id.closeProduct);
+        setContentView(R.layout.activity_search_product);
+        closeSearchProduct = findViewById(R.id.closeSearchProduct);
+        recyclerView_product = findViewById(R.id.recyclerView_product);
+        recyclerView_product = findViewById(R.id.recyclerView_product);
+        edt_searchProduct = findViewById(R.id.edt_searchProduct);
+        submit_searchProduct = findViewById(R.id.submit_searchProduct);
+        nullSearchProduct = findViewById(R.id.nullSearchProduct);
 
         // Khởi tạo adapter và thiết lập RecyclerView
         adapter = new ProductAdapter(new ArrayList<>());
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        // --------------------------
-        getProducts();
-        click_item_product();
-        closeProductBtn();
-    }
+        recyclerView_product.setAdapter(adapter);
+        recyclerView_product.setLayoutManager(new GridLayoutManager(this, 2));
 
-    private void closeProductBtn() {
-        closeProduct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ProductActivity.this, CategorisActivity.class));
-                finish();
-            }
-        });
+        closeSearchProductBtn();
+        searchProduct();
+        click_item_product();
     }
 
     private void click_item_product() {
@@ -99,7 +85,7 @@ public class ProductActivity extends AppCompatActivity {
                             String oldPriceFormatted = decimalFormat.format(product_detail_old_price_dt);
 
                             //Chuyển sang trang chi tiết sản phẩm với ID của sản phẩm được nhấp
-                            Intent intent = new Intent(ProductActivity.this, ProductDetailActivity.class);
+                            Intent intent = new Intent(SearchProductActivity.this, ProductDetailActivity.class);
                             intent.putExtra("productId", product_id_dt);
                             intent.putExtra("product_detail_id", product_detail_id_dt);
                             intent.putExtra("product_name", product_name_dt);
@@ -129,30 +115,45 @@ public class ProductActivity extends AppCompatActivity {
         adapter.setItemClickListener(itemClickListener);
     }
 
-    private void getProducts() {
-        RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
-        Call<List<Product>> call = retrofitApi.get_all_product();
-        call.enqueue(new Callback<List<Product>>() {
+    private void searchProduct() {
+        submit_searchProduct.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                if (response.isSuccessful()) {
-                    List<Product> productList = response.body();
-                    // Cập nhật danh sách sản phẩm trong adapter
-                    adapter.setProductList(productList);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    // Xử lý khi không thành công
-                    Log.e("fale product", "Failed to get products");
-                }
+            public void onClick(View view) {
+                nullSearchProduct.setVisibility(View.VISIBLE);
+                recyclerView_product.setVisibility(View.GONE);
+                String textSearch = edt_searchProduct.getText().toString();
+                RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+                Call<List<Product>> call = retrofitApi.search_products(textSearch);
+                call.enqueue(new Callback<List<Product>>() {
+                    @Override
+                    public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                        if (response.isSuccessful()) {
+                            List<Product> productList = response.body();
+                            if (productList != null) {
+                                nullSearchProduct.setVisibility(View.GONE);
+                                recyclerView_product.setVisibility(View.VISIBLE);
+                                adapter.setProductList(productList);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
 
-            }
+                    @Override
+                    public void onFailure(Call<List<Product>> call, Throwable t) {
 
-            @Override
-            public void onFailure(Call<List<Product>> call, Throwable t) {
-                Log.e("error", t.getMessage());
+                    }
+                });
             }
         });
-
     }
 
+    private void closeSearchProductBtn() {
+        closeSearchProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SearchProductActivity.this, CategorisActivity.class));
+                finish();
+            }
+        });
+    }
 }

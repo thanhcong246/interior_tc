@@ -2,8 +2,10 @@ package com.vn.tcshop.foodapp.Retrofits.Apis;
 
 import com.vn.tcshop.foodapp.Models.Cart;
 import com.vn.tcshop.foodapp.Models.CartByPayment;
+import com.vn.tcshop.foodapp.Models.Category;
 import com.vn.tcshop.foodapp.Models.City;
 import com.vn.tcshop.foodapp.Models.District;
+import com.vn.tcshop.foodapp.Models.Payments;
 import com.vn.tcshop.foodapp.Models.Product;
 import com.vn.tcshop.foodapp.Models.ProductReviewRatingSumOverAll;
 import com.vn.tcshop.foodapp.Models.ProductReviews;
@@ -75,13 +77,28 @@ public interface RetrofitApi {
             @Field("password") String password
     );
 
+    @FormUrlEncoded
+    @POST("search_products")
+    Call<List<Product>> search_products(
+            @Field("search_product") String search_product
+    );
+
     @GET("get_all_product")
     Call<List<Product>> get_all_product();
+
+    @GET("get_all_category")
+    Call<List<Category>> get_all_category();
 
     @FormUrlEncoded
     @POST("get_product_by_id")
     Call<List<Product_detail>> get_product_by_id(
             @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
+    @POST("get_all_product_by_category_id")
+    Call<List<Product>> get_all_product_by_category_id(
+            @Field("category_id") int category_id
     );
 
     @FormUrlEncoded
@@ -128,8 +145,24 @@ public interface RetrofitApi {
     );
 
     @FormUrlEncoded
+    @POST("add_cart_payment_by_id")
+    Call<CartByIdResponse> add_cart_payment_by_id(
+            @Field("product_id") int product_id,
+            @Field("email") String email,
+            @Field("price") int price,
+            @Field("cart_name") String cart_name,
+            @Field("cart_img") String cart_img
+    );
+
+    @FormUrlEncoded
     @POST("get_cart_by_id")
     Call<List<Cart>> get_cart_by_id(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("get_cart_payment_by_id")
+    Call<List<Cart>> get_cart_payment_by_id(
             @Field("email") String email
     );
 
@@ -140,8 +173,20 @@ public interface RetrofitApi {
     );
 
     @FormUrlEncoded
+    @POST("total_price_and_quantity_cart_payment_by_id")
+    Call<CartByPayment> total_price_and_quantity_cart_payment_by_id(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
     @POST("delete_all_cart")
     Call<CartDeleteAllResponse> delete_all_cart(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("delete_all_cart_payment")
+    Call<CartDeleteAllResponse> delete_all_cart_payment(
             @Field("email") String email
     );
 
@@ -153,8 +198,22 @@ public interface RetrofitApi {
     );
 
     @FormUrlEncoded
+    @POST("delete_cart_payment_by_id_all")
+    Call<CartRemoveProductIdAll> delete_cart_payment_by_id_all(
+            @Field("email") String email,
+            @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
     @POST("delete_cart_by_id")
     Call<CartRemoveProductId> delete_cart_by_id(
+            @Field("email") String email,
+            @Field("product_id") int product_id
+    );
+
+    @FormUrlEncoded
+    @POST("delete_cart_payment_by_id")
+    Call<CartRemoveProductId> delete_cart_payment_by_id(
             @Field("email") String email,
             @Field("product_id") int product_id
     );
@@ -168,5 +227,20 @@ public interface RetrofitApi {
 
     @GET("d/{districtCode}?depth=2")
     Call<District> getWards(@Path("districtCode") int districtCode);
+    //
 
+    @FormUrlEncoded
+    @POST("add_payments")
+    Call<Payments> add_payments(
+            @Field("name") String name,
+            @Field("email") String email,
+            @Field("phone") String phone,
+            @Field("apartment_number") String apartment_number,
+            @Field("ward") String ward,
+            @Field("district") String district,
+            @Field("province") String province,
+            @Field("note") String note,
+            @Field("quantityProduct") int quantityProduct,
+            @Field("total") int total
+    );
 }
