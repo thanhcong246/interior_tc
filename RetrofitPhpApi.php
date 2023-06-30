@@ -200,18 +200,92 @@ function add_category()
     global $con;
 
     $name = $_POST["name"];
-    $description = $_POST["description"];
 
     $name = mysqli_real_escape_string($con, $name);
-    $description = mysqli_real_escape_string($con, $description);
 
-    $query = "INSERT INTO Categories (name, description) VALUES ('$name', '$description')";
+    if (isset($_FILES['category_img'])) {
+        $image_file = $_FILES['category_img']['tmp_name'];
+        $image_name = $_FILES['category_img']['name'];
+        $image_path = 'uploads/' . uniqid() . '.' . $image_name;
 
-    if (mysqli_query($con, $query)) {
-        $response = array("errorcode" => "000", "message" => "Category added successfully");
-        echo json_encode($response);
+        // Di chuyển tệp hình ảnh vào thư mục uploads
+        if (move_uploaded_file($image_file, $image_path)) {
+            $image_filename = basename($image_path);
+
+            $query = "INSERT INTO categories (name, category_img) VALUES ('$name', '$image_filename')";
+
+            if (mysqli_query($con, $query)) {
+                $response = array("errorcode" => "000", "message" => "Category added successfully");
+                echo json_encode($response);
+            } else {
+                $response = array("errorcode" => "101", "message" => "Failed to add Category");
+                echo json_encode($response);
+            }
+        } else {
+            $response = array("errorcode" => "102", "message" => "Failed to move uploaded image");
+            echo json_encode($response);
+        }
     } else {
-        $response = array("errorcode" => "111", "message" => "Failed to add category");
+        $response = array("errorcode" => "111", "message" => "No image uploaded");
+        echo json_encode($response);
+    }
+}
+
+function update_category()
+{
+    global $con;
+
+    $category_id = $_POST["category_id"];
+    $name = $_POST["name"];
+
+    $name = mysqli_real_escape_string($con, $name);
+
+    $query = "SELECT category_img FROM categories WHERE category_id = $category_id";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $category = mysqli_fetch_assoc($result);
+        $old_image = $category['category_img'];
+
+        if (isset($_FILES['category_img'])) {
+            $image_file = $_FILES['category_img']['tmp_name'];
+            $image_name = $_FILES['category_img']['name'];
+            $image_path = 'uploads/' . uniqid() . '.' . $image_name;
+
+            if (move_uploaded_file($image_file, $image_path)) {
+                $image_filename = basename($image_path);
+
+                $query = "UPDATE categories SET name = '$name', category_img = '$image_filename' WHERE category_id = $category_id";
+
+                if (mysqli_query($con, $query)) {
+                    // Delete old image file
+                    if ($old_image && file_exists("uploads/$old_image")) {
+                        unlink("uploads/$old_image");
+                    }
+
+                    $response = array("errorcode" => "000", "message" => "Category updated successfully");
+                    echo json_encode($response);
+                } else {
+                    $response = array("errorcode" => "101", "message" => "Failed to update Category");
+                    echo json_encode($response);
+                }
+            } else {
+                $response = array("errorcode" => "102", "message" => "Failed to move uploaded image");
+                echo json_encode($response);
+            }
+        } else {
+            $query = "UPDATE categories SET name = '$name' WHERE category_id = $category_id";
+
+            if (mysqli_query($con, $query)) {
+                $response = array("errorcode" => "000", "message" => "Category updated successfully");
+                echo json_encode($response);
+            } else {
+                $response = array("errorcode" => "101", "message" => "Failed to update Category");
+                echo json_encode($response);
+            }
+        }
+    } else {
+        $response = array("errorcode" => "103", "message" => "Category not found");
         echo json_encode($response);
     }
 }
@@ -324,47 +398,57 @@ function search_products()
     global $con;
 
     $search_product = $_POST["search_product"];
+    $search_product = trim($search_product); // Xóa khoảng trắng ở đầu và cuối
 
-    // Tìm kiếm theo tên sản phẩm
-    $product_query = "SELECT * FROM Products WHERE name LIKE '%$search_product%'";
-    $product_result = mysqli_query($con, $product_query);
-    $products = array();
+    // Tìm kiếm theo tên sản phẩm và áp dụng giảm giá
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price 
+              FROM Products 
+              WHERE name LIKE '%$search_product%'";
+    $result = mysqli_query($con, $query);
 
-    if (mysqli_num_rows($product_result) > 0) {
-        while ($row = mysqli_fetch_assoc($product_result)) {
-            $products[] = $row;
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product = array(
+                "product_id" => $row["product_id"],
+                "name" => $row["name"],
+                "image_url" => $row["image_url"],
+                "price" => $row["price"]
+            );
+            $products[] = $product;
         }
-    }
 
-    // Tìm kiếm theo tên danh mục
-    $category_query = "SELECT * FROM Categories WHERE name LIKE '%$search_product%'";
-    $category_result = mysqli_query($con, $category_query);
-    $category_products = array();
-
-    if (mysqli_num_rows($category_result) > 0) {
-        while ($category = mysqli_fetch_assoc($category_result)) {
-            $category_id = $category['category_id'];
-
-            // Tìm kiếm sản phẩm theo danh mục
-            $category_product_query = "SELECT * FROM Products WHERE category_id = $category_id";
-            $category_product_result = mysqli_query($con, $category_product_query);
-
-            if (mysqli_num_rows($category_product_result) > 0) {
-                while ($row = mysqli_fetch_assoc($category_product_result)) {
-                    $category_products[] = $row;
-                }
-            }
-        }
-    }
-
-    // Kết hợp kết quả từ tìm kiếm theo tên sản phẩm và tìm kiếm theo danh mục
-    $products = array_unique(array_merge($products, $category_products), SORT_REGULAR);
-
-    if (count($products) > 0) {
-        $response = array("errorcode" => "000", "message" => "Search results found", "products" => $products);
-        echo json_encode($response);
+        echo json_encode($products);
     } else {
         $response = array("errorcode" => "111", "message" => "No search results found");
+        echo json_encode($response);
+    }
+}
+
+
+function get_all_category()
+{
+    global $con;
+
+    $query = "SELECT * FROM categories";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product = array(
+                "category_id" => $row["category_id"],
+                "name" => $row["name"],
+                "category_img" => $row["category_img"],
+            );
+            $products[] = $product;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("errorcode" => "111", "message" => "No categoris found");
         echo json_encode($response);
     }
 }
@@ -393,6 +477,38 @@ function get_all_product()
         echo json_encode($products);
     } else {
         $response = array("errorcode" => "111", "message" => "No products found");
+        echo json_encode($response);
+    }
+}
+
+function get_all_product_by_category_id()
+{
+    global $con;
+
+    $category_id = $_POST["category_id"];
+    $category_id = mysqli_real_escape_string($con, $category_id);
+
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price 
+              FROM Products 
+              WHERE category_id = $category_id";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product = array(
+                "product_id" => $row["product_id"],
+                "name" => $row["name"],
+                "image_url" => $row["image_url"],
+                "price" => $row["price"]
+            );
+            $products[] = $product;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("errorcode" => "111", "message" => "No products found for the given category");
         echo json_encode($response);
     }
 }
@@ -830,12 +946,91 @@ function add_cart_by_id()
 
 }
 
+function add_cart_payment_by_id()
+{
+
+    global $con;
+
+    $product_id = $_POST["product_id"];
+    $email = $_POST["email"];
+    $price = $_POST["price"];
+    $cart_name = $_POST["cart_name"];
+    $cart_img = $_POST["cart_img"];
+
+
+    $query = "INSERT INTO cart_payment (product_id, email, price, cart_name, cart_img) 
+              VALUES ('$product_id', '$email', '$price', '$cart_name', '$cart_img')";
+
+    if (mysqli_query($con, $query)) {
+        $response = array("error_cart_add" => "000");
+        echo json_encode($response);
+    } else {
+        $response = array("error_cart_add" => "111");
+        echo json_encode($response);
+    }
+
+}
+
 function get_cart_by_id()
 {
     global $con;
 
     $email = $_POST["email"];
     $query = "SELECT * FROM carts WHERE email = '$email'";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+        $product_ids = array(); // Mảng lưu trữ product_id đã xuất hiện
+        $quantity_product_id = array(); // Mảng lưu trữ số lần xuất hiện của từng product_id
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product_id = $row["product_id"];
+
+            // Kiểm tra xem product_id đã tồn tại trong mảng kết hợp chưa
+            if (!in_array($product_id, $product_ids)) {
+                $product = array(
+                    "product_id" => $product_id,
+                    "email" => $row["email"],
+                    "price" => $row["price"],
+                    "cart_name" => $row["cart_name"],
+                    "cart_img" => $row["cart_img"]
+                );
+                $products[] = $product;
+
+                // Đánh dấu product_id đã xuất hiện
+                $product_ids[] = $product_id;
+            }
+
+            // Tăng số lần xuất hiện của product_id
+            if (isset($quantity_product_id[$product_id])) {
+                $quantity_product_id[$product_id]++;
+            } else {
+                $quantity_product_id[$product_id] = 1;
+            }
+        }
+
+        // Thêm quantity_product_id và sum_product_id_price vào mỗi sản phẩm trong mảng $products
+        foreach ($products as &$product) {
+            $product_id = $product["product_id"];
+            $quantity = $quantity_product_id[$product_id];
+            $product["quantity_product_id"] = $quantity;
+            $product["sum_product_id_price"] = $product["price"] * $quantity;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("error_get_cart" => "111");
+        echo json_encode($response);
+    }
+}
+
+function get_cart_payment_by_id()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $query = "SELECT * FROM cart_payment WHERE email = '$email'";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
@@ -909,6 +1104,31 @@ function total_price_and_quantity_cart_by_id()
     echo json_encode($response);
 }
 
+function total_price_and_quantity_cart_payment_by_id()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $query = "SELECT product_id, COUNT(DISTINCT product_id) AS total_quantity, SUM(price) AS total_price
+              FROM cart_payment 
+              WHERE email = '$email' 
+              GROUP BY product_id";
+    $result = mysqli_query($con, $query);
+
+    $total_price = 0;
+    $total_quantity = 0;
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $total_price += $row["total_price"];
+        $total_quantity += $row["total_quantity"];
+    }
+
+    $total_payment = $total_price + 220000;
+
+    $response = array("transportation_costs" => 220000, "total_price" => $total_price, "total_quantity" => $total_quantity, "total_payment" => $total_payment);
+    echo json_encode($response);
+}
+
 function delete_cart_by_id()
 {
     global $con;
@@ -916,6 +1136,24 @@ function delete_cart_by_id()
     $email = $_POST["email"];
     $product_id = $_POST["product_id"];
     $query = "DELETE FROM carts WHERE email = '$email' AND product_id = '$product_id' LIMIT 1";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $response = array("error_remove_cart_by_id" => "000");
+    } else {
+        $response = array("error_remove_cart_by_id" => "111");
+    }
+
+    echo json_encode($response);
+}
+
+function delete_cart_payment_by_id()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $product_id = $_POST["product_id"];
+    $query = "DELETE FROM cart_payment WHERE email = '$email' AND product_id = '$product_id' LIMIT 1";
     $result = mysqli_query($con, $query);
 
     if ($result) {
@@ -945,6 +1183,24 @@ function delete_cart_by_id_all()
     echo json_encode($response);
 }
 
+function delete_cart_payment_by_id_all()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $product_id = $_POST["product_id"];
+    $query = "DELETE FROM cart_payment WHERE email = '$email' AND product_id = '$product_id'";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $response = array("error_remove_cart_by_id_all" => "000");
+    } else {
+        $response = array("error_remove_cart_by_id_all" => "111");
+    }
+
+    echo json_encode($response);
+}
+
 function delete_all_cart()
 {
     global $con;
@@ -960,6 +1216,60 @@ function delete_all_cart()
     }
 
     echo json_encode($response);
+}
+
+function delete_all_cart_payment()
+{
+    global $con;
+
+    $email = $_POST["email"];
+    $query = "DELETE FROM cart_payment WHERE email = '$email'";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $response = array("error_all_cart_by_product_id" => "000");
+    } else {
+        $response = array("error_all_cart_by_product_id" => "111");
+    }
+
+    echo json_encode($response);
+}
+
+function add_payments()
+{
+    global $con;
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $phone = $_POST["phone"];
+    $apartment_number = $_POST["apartment_number"];
+    $ward = $_POST["ward"];
+    $district = $_POST["district"];
+    $province = $_POST["province"];
+    $note = $_POST["note"];
+    $quantityProduct = $_POST["quantityProduct"];
+    $total = $_POST["total"];
+
+    $name = mysqli_real_escape_string($con, $name);
+    $email = mysqli_real_escape_string($con, $email);
+    $phone = mysqli_real_escape_string($con, $phone);
+    $apartment_number = mysqli_real_escape_string($con, $apartment_number);
+    $ward = mysqli_real_escape_string($con, $ward);
+    $district = mysqli_real_escape_string($con, $district);
+    $province = mysqli_real_escape_string($con, $province);
+    $note = mysqli_real_escape_string($con, $note);
+    $quantityProduct = mysqli_real_escape_string($con, $quantityProduct);
+    $total = mysqli_real_escape_string($con, $total);
+
+    $query = "INSERT INTO payments (name, email, phone, apartment_number, ward, district, province, note, quantityProduct, total) 
+                        VALUES ('$name', '$email', '$phone', '$apartment_number', '$ward', '$district', '$province', '$note', '$quantityProduct', '$total')";
+
+    if (mysqli_query($con, $query)) {
+        $response = array("payments" => "000");
+        echo json_encode($response);
+    } else {
+        $response = array("payments" => "111");
+        echo json_encode($response);
+    }
 }
 
 
@@ -992,6 +1302,10 @@ switch ($action) {
         add_category();
         break;
 
+    case "update_category":
+        update_category();
+        break;
+
     case "add_product":
         add_product();
         break;
@@ -1004,8 +1318,16 @@ switch ($action) {
         search_products();
         break;
 
+    case "get_all_category":
+        get_all_category();
+        break;
+
     case "get_all_product":
         get_all_product();
+        break;
+
+    case "get_all_product_by_category_id":
+        get_all_product_by_category_id();
         break;
 
     case "get_product_by_id":
@@ -1056,24 +1378,52 @@ switch ($action) {
         add_cart_by_id();
         break;
 
+    case "add_cart_payment_by_id":
+        add_cart_payment_by_id();
+        break;
+
     case "get_cart_by_id":
         get_cart_by_id();
+        break;
+
+    case "get_cart_payment_by_id":
+        get_cart_payment_by_id();
         break;
 
     case "total_price_and_quantity_cart_by_id":
         total_price_and_quantity_cart_by_id();
         break;
 
+    case "total_price_and_quantity_cart_payment_by_id":
+        total_price_and_quantity_cart_payment_by_id();
+        break;
+
     case "delete_cart_by_id":
         delete_cart_by_id();
+        break;
+
+    case "delete_cart_payment_by_id":
+        delete_cart_payment_by_id();
         break;
 
     case "delete_cart_by_id_all":
         delete_cart_by_id_all();
         break;
 
+    case "delete_cart_payment_by_id_all":
+        delete_cart_payment_by_id_all();
+        break;
+
     case "delete_all_cart":
         delete_all_cart();
+        break;
+
+    case "delete_all_cart_payment":
+        delete_all_cart_payment();
+        break;
+
+    case "add_payments":
+        add_payments();
         break;
 
     default :
