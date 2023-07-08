@@ -32,6 +32,7 @@
         app:layout_constraintVertical_bias="0.2">
 
         <TextView
+            android:id="@+id/login_google"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edt_border"
@@ -45,23 +46,7 @@
             android:textSize="25sp"
             android:textStyle="bold"
             app:drawableStartCompat="@drawable/google_36" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/edt_border"
-            android:drawablePadding="10dp"
-            android:paddingStart="90dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:text="@string/login_facebook"
-            android:textAllCaps="true"
-            android:textColor="#000000"
-            android:textSize="25sp"
-            android:textStyle="bold"
-            app:drawableStartCompat="@drawable/facebook_36" />
-
+        
         <TextView
             android:id="@+id/main_login"
             android:layout_width="match_parent"

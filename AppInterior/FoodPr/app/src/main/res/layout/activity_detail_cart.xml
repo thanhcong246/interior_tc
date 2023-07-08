@@ -119,7 +119,8 @@
             android:background="@drawable/edt_payment"
             android:hint="Tên của bạn"
             android:inputType="text"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="#C4000000" />
 
         <EditText
             android:id="@+id/payment_email"
@@ -130,7 +131,8 @@
             android:background="@drawable/edt_payment"
             android:hint="Email"
             android:inputType="text"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColor="#C4000000" />
 
         <EditText
             android:id="@+id/payment_phone"

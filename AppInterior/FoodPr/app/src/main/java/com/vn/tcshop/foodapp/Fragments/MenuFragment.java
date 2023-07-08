@@ -23,7 +23,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.vn.tcshop.foodapp.Activitis.Accounts.LoginActivity;
+import com.vn.tcshop.foodapp.Activitis.MainActivity;
 import com.vn.tcshop.foodapp.Adapters.MenuAdapter;
 import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Models.MenuItemModel;
@@ -48,13 +54,18 @@ public class MenuFragment extends Fragment {
     private static final String KEY_REMEMBER_ME = "remember_me";
     private TextView fragment_home_menu_user_tv, fragment_home_menu_email_tv;
     private TextView btn_logout;
-    private ImageView  btn_close_fragment_menu;
+    private ImageView btn_close_fragment_menu;
+    GoogleSignInOptions gso;
+    GoogleSignInClient gsc;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
         setHasOptionsMenu(true); // Bật chế độ hiển thị menu
+
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        gsc = GoogleSignIn.getClient(getActivity(), gso);
 
         // Khởi tạo danh sách danh mục từ menu.xml
         menuItems = getMenuItems();
@@ -138,14 +149,20 @@ public class MenuFragment extends Fragment {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Khi đăng xuất
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove(KEY_EMAIL);
-                editor.remove(KEY_PASSWORD);
-                editor.remove(KEY_REMEMBER_ME);
-                editor.apply();
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                getActivity().finish();
+                gsc.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(Task<Void> task) {
+                        // Khi đăng xuất
+                        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.remove(KEY_EMAIL);
+                        editor.remove(KEY_PASSWORD);
+                        editor.remove(KEY_REMEMBER_ME);
+                        editor.apply();
+                        startActivity(new Intent(getActivity(), MainActivity.class));
+                        getActivity().finish();
+                    }
+                });
             }
         });
     }

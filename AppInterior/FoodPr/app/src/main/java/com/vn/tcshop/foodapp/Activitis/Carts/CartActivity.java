@@ -263,7 +263,7 @@ public class CartActivity extends AppCompatActivity {
                     editor.apply();
 
                     // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                    DecimalFormat decimalFormat = new DecimalFormat("#,###");
+                    DecimalFormat decimalFormat = new DecimalFormat("#.###");
                     String total_price_format = decimalFormat.format(total_price);
                     String transportation_costs_format = decimalFormat.format(transportation_costs);
                     String total_payment_format = decimalFormat.format(total_payment);

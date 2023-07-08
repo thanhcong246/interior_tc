@@ -2,6 +2,9 @@ package com.vn.tcshop.foodapp.Activitis.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +21,7 @@ import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Activitis.HomeActivity;
 import com.vn.tcshop.foodapp.Activitis.Products.CategorisActivity;
 import com.vn.tcshop.foodapp.Activitis.Products.ProductActivity;
+import com.vn.tcshop.foodapp.Fragments.SettingFragment;
 import com.vn.tcshop.foodapp.R;
 
 public class SettingActivity extends AppCompatActivity {
@@ -30,6 +34,8 @@ public class SettingActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private TextView notification_product_cart;
     private RelativeLayout relativelayout_1;
+    private SettingFragment settingFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +70,16 @@ public class SettingActivity extends AppCompatActivity {
         }
 
         bottomNavigationView();
+        displayFragmentMenu();
+    }
+
+    private void displayFragmentMenu() {
+        settingFragment = new SettingFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.setting_fragment, settingFragment);
+        fragmentTransaction.commit();
+
     }
 
     private void logout_btn() {

@@ -43,7 +43,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         holder.nameTextView.setText(product.getName());
 
         // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+        DecimalFormat decimalFormat = new DecimalFormat("#.###");
         String priceFormatted = decimalFormat.format(product.getPrice());
         holder.priceTextView.setText(priceFormatted + "₫");
 

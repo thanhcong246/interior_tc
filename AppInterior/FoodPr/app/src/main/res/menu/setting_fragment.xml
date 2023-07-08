@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home_fragment"
+        android:icon="@drawable/home_20"
+        android:title="Trang chủ" />
+    <item
+        android:id="@+id/nav_product_fragment"
+        android:icon="@drawable/apps_20"
+        android:title="Sản phẩm" />
+    <item
+        android:id="@+id/nav_cart_fragment"
+        android:icon="@drawable/shopping_cart_20"
+        android:title="Giỏ hàng" />
+    <item
+        android:id="@+id/nav_notification_fragment"
+        android:icon="@drawable/bell_20"
+        android:title="Thông báo" />
+    <item
+        android:id="@+id/nav_history_fragment"
+        android:icon="@drawable/calendar_20"
+        android:title="Lịch sử giao dịch" />
+    <item
+        android:id="@+id/nav_chat_fragment"
+        android:icon="@drawable/comments_20"
+        android:title="Trò chuyện" />
+    <item
+        android:id="@+id/nav_question_fragment"
+        android:icon="@drawable/interrogation_20"
+        android:title="Câu hỏi thường gặp" />
+
+    <item
+        android:id="@+id/nav_logout_fragment"
+        android:icon="@drawable/sign_in_alt_20"
+        android:title="Đăng xuất" />
+
+</menu>

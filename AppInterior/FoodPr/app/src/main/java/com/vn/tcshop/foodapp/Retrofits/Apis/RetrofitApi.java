@@ -5,6 +5,7 @@ import com.vn.tcshop.foodapp.Models.CartByPayment;
 import com.vn.tcshop.foodapp.Models.Category;
 import com.vn.tcshop.foodapp.Models.City;
 import com.vn.tcshop.foodapp.Models.District;
+import com.vn.tcshop.foodapp.Models.Payment;
 import com.vn.tcshop.foodapp.Models.Payments;
 import com.vn.tcshop.foodapp.Models.Product;
 import com.vn.tcshop.foodapp.Models.ProductReviewRatingSumOverAll;
@@ -242,5 +243,17 @@ public interface RetrofitApi {
             @Field("note") String note,
             @Field("quantityProduct") int quantityProduct,
             @Field("total") int total
+    );
+
+    @FormUrlEncoded
+    @POST("get_history")
+    Call<List<Payment>> get_history(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("get_history_detail")
+    Call<Payment> get_history_detail(
+            @Field("payment_id") int payment_id
     );
 }

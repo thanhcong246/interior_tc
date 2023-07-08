@@ -15,10 +15,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Activitis.Products.CategorisActivity;
+import com.vn.tcshop.foodapp.Activitis.Products.SearchProductActivity;
 import com.vn.tcshop.foodapp.Fragments.MenuFragment;
 import com.vn.tcshop.foodapp.Activitis.Products.ProductActivity;
 import com.vn.tcshop.foodapp.R;
@@ -32,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private TextView notification_product_cart;
     private RelativeLayout relativelayout_1;
+    private ImageView home_search_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,7 @@ public class HomeActivity extends AppCompatActivity {
         menuButton = findViewById(R.id.home_menu_btn);
         relativelayout_1 = findViewById(R.id.relativelayout_1);
         notification_product_cart = findViewById(R.id.notification_product_cart);
+        home_search_btn = findViewById(R.id.home_search_btn);
 
         // hiển thị thông báo product
         sharedPreferences = getSharedPreferences("notification_quantity_product", Context.MODE_PRIVATE);
@@ -56,6 +63,17 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView();
         // Hiển thị Fragment Menu
         displayFragmentMenu();
+        showSearchProductBtn();
+    }
+
+    private void showSearchProductBtn() {
+        home_search_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HomeActivity.this, SearchProductActivity.class));
+                finish();
+            }
+        });
     }
 
     private void displayFragmentMenu() {

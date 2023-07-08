@@ -16,6 +16,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".Activitis.Historys.HistoryDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activitis.Historys.HistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activitis.Carts.PaymentActivity"
             android:exported="false" />
         <activity

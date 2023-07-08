@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,12 +19,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.vn.tcshop.foodapp.Activitis.Accounts.EmailSender;
+import com.vn.tcshop.foodapp.Activitis.Accounts.RecoverCodeActivity;
+import com.vn.tcshop.foodapp.Activitis.Accounts.RecoverEmailActivity;
 import com.vn.tcshop.foodapp.Models.CartByPayment;
 import com.vn.tcshop.foodapp.Models.City;
 import com.vn.tcshop.foodapp.Models.District;
 import com.vn.tcshop.foodapp.Models.Payments;
 import com.vn.tcshop.foodapp.Models.Province;
 import com.vn.tcshop.foodapp.Models.Responses.CartDeleteAllResponse;
+import com.vn.tcshop.foodapp.Models.Responses.RecoverEmailResponse;
 import com.vn.tcshop.foodapp.Models.Ward;
 import com.vn.tcshop.foodapp.R;
 import com.vn.tcshop.foodapp.Retrofits.Apis.RetrofitApi;
@@ -130,6 +135,11 @@ public class DetailCartActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (!phone.matches("\\d+")) {
+                    payment_phone.setError("Phone không hợp lệ");
+                    return;
+                }
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(DetailCartActivity.this);
                 builder.setTitle("Xác nhận thanh toán")
                         .setMessage("Bạn có chắc chắn muốn tiến hành thanh toán?")
@@ -151,10 +161,12 @@ public class DetailCartActivity extends AppCompatActivity {
                                                 int caseP = getIntent().getIntExtra("case", 0);
                                                 if (caseP == 1) {
                                                     deleteAllProductCart(savedEmail);
+                                                    sendMailPayment(savedName, savedEmail, quantityProduct, total);
                                                     startActivity(new Intent(DetailCartActivity.this, CartActivity.class));
                                                     finish();
                                                 } else {
                                                     deleteAllProductCartPayment(savedEmail);
+                                                    sendMailPayment(savedName, savedEmail, quantityProduct, total);
                                                     startActivity(new Intent(DetailCartActivity.this, PaymentActivity.class));
                                                     finish();
                                                 }
@@ -177,6 +189,54 @@ public class DetailCartActivity extends AppCompatActivity {
                             }
                         })
                         .show();
+            }
+        });
+    }
+
+    private void sendMailPayment(String savedName, String savedEmail, int quantityProduct, int total) {
+
+        RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
+        Call<RecoverEmailResponse> call = retrofitApi.recoverEmail(savedEmail);
+        call.enqueue(new Callback<RecoverEmailResponse>() {
+            @Override
+            public void onResponse(Call<RecoverEmailResponse> call, Response<RecoverEmailResponse> response) {
+                if (response.isSuccessful()) {
+                    RecoverEmailResponse recoverEmailResponse = response.body();
+                    String error_recover_email = recoverEmailResponse.getError_recover_email();
+                    String email = recoverEmailResponse.getEmail();
+                    String login_info = recoverEmailResponse.getLogin_info();
+                    Log.d("error_recover_email", error_recover_email);
+                    if (Objects.equals(error_recover_email, "111")) {
+                        Log.e("email", "Email không tồn tại");
+                        return;
+                    }
+                    if (Objects.equals(error_recover_email, "000")) {
+                        Log.d("error_recover_email", email + " " + login_info);
+                        String subject = "Food Tech";
+                        String body = "Xin chào " + savedName + ",\n" +
+                                "\n" +
+                                "Chúng tôi xin gửi đến bạn thông tin chi tiết về đơn hàng của bạn:\n" +
+                                "\n" +
+                                "- Tên khách hàng: " + savedName + "\n" +
+                                "- Email: " + savedEmail + "\n" +
+                                "- Số lượng sản phẩm: " + quantityProduct + "\n" +
+                                "- Tổng tiền: " + total + "\n" +
+                                "\n" +
+                                "Chúng tôi xác nhận đã nhận thanh toán của bạn và đang tiến hành xử lý đơn hàng. Sản phẩm sẽ được gửi đến địa chỉ đã cung cấp trong thời gian sớm nhất có thể.\n" +
+                                "Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu hỗ trợ nào, vui lòng liên hệ với chúng tôi qua địa chỉ email này. Chúng tôi sẵn lòng giúp đỡ bạn.\n" +
+                                "Một lần nữa, chúng tôi xin chân thành cảm ơn sự ủng hộ của bạn và hy vọng bạn sẽ hài lòng với sản phẩm đã mua.\n" +
+                                "\n" +
+                                "Trân trọng,\n" +
+                                "TCShop FD";
+                        EmailSender.sendEmail(savedEmail, subject, body);
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RecoverEmailResponse> call, Throwable t) {
+
             }
         });
     }
@@ -239,7 +299,7 @@ public class DetailCartActivity extends AppCompatActivity {
                     int total_payment = cartByPayment.getTotal_payment();
 
                     // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                    DecimalFormat decimalFormat = new DecimalFormat("#,###");
+                    DecimalFormat decimalFormat = new DecimalFormat("#.###");
                     String total_payment_format = decimalFormat.format(total_payment);
                     payment_quantity.setText(String.valueOf(total_quantity));
                     payment_total.setText(total_payment_format + "₫");
@@ -273,7 +333,7 @@ public class DetailCartActivity extends AppCompatActivity {
                     editor.apply();
 
                     // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                    DecimalFormat decimalFormat = new DecimalFormat("#,###");
+                    DecimalFormat decimalFormat = new DecimalFormat("#.###");
                     String total_payment_format = decimalFormat.format(total_payment);
                     payment_quantity.setText(String.valueOf(total_quantity));
                     payment_total.setText(total_payment_format + "₫");
@@ -418,7 +478,6 @@ public class DetailCartActivity extends AppCompatActivity {
                     }
                 });
             }
-
 
             @Override
             public void onFailure(Call<District> call, Throwable t) {

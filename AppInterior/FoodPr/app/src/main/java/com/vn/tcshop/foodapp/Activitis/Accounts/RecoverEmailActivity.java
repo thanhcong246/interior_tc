@@ -93,7 +93,7 @@ public class RecoverEmailActivity extends AppCompatActivity {
                             }
                             if (Objects.equals(error_recover_email, "000")) {
                                 Log.d("error_recover_email", email + " " + login_info);
-                                String subject = "Food Tech";
+                                String subject = "TCShop FD";
                                 String body = "Xin chào,\n" +
                                         "\n" +
                                         "Chúng tôi đã nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn. Dưới đây là thông tin cần thiết để bạn thực hiện quy trình khôi phục mật khẩu:\n" +
