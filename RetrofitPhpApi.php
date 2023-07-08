@@ -1270,7 +1270,48 @@ function add_payments()
         $response = array("payments" => "111");
         echo json_encode($response);
     }
+
 }
+
+function get_history()
+{
+    global $con;
+    $email = $_POST["email"];
+    $email = mysqli_real_escape_string($con, $email);
+    $sql = "SELECT payment_id, total, payment_date FROM payments WHERE email = '$email'";
+    $result = mysqli_query($con, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+        $historys = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $historys[] = $row;
+        }
+
+        echo json_encode($historys);
+    } else {
+        $response = array("error_history" => "111");
+        echo json_encode($response);
+    }
+
+}
+
+function get_history_detail()
+{
+    global $con;
+    $payment_id = $_POST["payment_id"];
+    $sql = "SELECT * FROM payments WHERE payment_id = '$payment_id'";
+    $result = mysqli_query($con, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        echo json_encode($row);
+    } else {
+        $response = array("error_history_detail" => "111");
+        echo json_encode($response);
+    }
+}
+
 
 
 switch ($action) {
@@ -1424,6 +1465,14 @@ switch ($action) {
 
     case "add_payments":
         add_payments();
+        break;
+
+    case "get_history":
+        get_history();
+        break;
+
+    case "get_history_detail":
+        get_history_detail();
         break;
 
     default :
