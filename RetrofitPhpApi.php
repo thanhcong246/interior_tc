@@ -469,7 +469,8 @@ function get_all_product()
                 "product_id" => $row["product_id"],
                 "name" => $row["name"],
                 "image_url" => $row["image_url"],
-                "price" => $row["price"]
+                "price" => $row["price"],
+                "discount" => $row["discount"]
             );
             $products[] = $product;
         }
@@ -1312,6 +1313,257 @@ function get_history_detail()
     }
 }
 
+function add_notification()
+{
+    global $con;
+    $title = $_POST["title"];
+    $email = $_POST["email"];
+    $title = mysqli_real_escape_string($con, $title);
+    $email = mysqli_real_escape_string($con, $email);
+
+    $query = "INSERT INTO notifications (title, date_time, email) VALUES ('$title', NOW(), '$email')";
+    if (mysqli_query($con, $query)) {
+        $response = array("notifications_s" => "000");
+        echo json_encode($response);
+    } else {
+        $response = array("notifications_s" => "111");
+        echo json_encode($response);
+    }
+
+}
+
+function get_notifications()
+{
+    global $con;
+    $email = $_POST["email"];
+    $email = mysqli_real_escape_string($con, $email);
+    $sql = "SELECT * FROM notifications WHERE email = '$email'";
+    $result = mysqli_query($con, $sql);
+
+    $response = array();
+
+    if (mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $response[] = $row;
+        }
+        echo json_encode($response);
+    } else {
+        $response = array("notifications_s" => "101");
+        echo json_encode($response);
+    }
+}
+
+function get_all_slider()
+{
+    global $con;
+
+    $query = "SELECT * FROM sliders";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product = array(
+                "slider_id" => $row["slider_id"],
+                "img_1" => $row["img_1"],
+                "img_2" => $row["img_2"],
+                "img_3" => $row["img_3"],
+                "img_4" => $row["img_4"],
+                "img_5" => $row["img_5"]
+            );
+            $products[] = $product;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("slider_error" => "111");
+        echo json_encode($response);
+    }
+}
+
+function add_slider()
+{
+    global $con;
+
+    if (isset($_FILES['img_1'])) {
+        $image_file_img_1 = $_FILES['img_1']['tmp_name'];
+        $image_name_img_1 = $_FILES['img_1']['name'];
+        $image_extension_img_1 = pathinfo($image_name_img_1, PATHINFO_EXTENSION);
+        $image_path_img_1 = 'img_slider/' . uniqid() . '.' . $image_extension_img_1;
+
+        $image_file_img_2 = $_FILES['img_2']['tmp_name'];
+        $image_name_img_2 = $_FILES['img_2']['name'];
+        $image_extension_img_2 = pathinfo($image_name_img_2, PATHINFO_EXTENSION);
+        $image_path_img_2 = 'img_slider/' . uniqid() . '.' . $image_extension_img_2;
+
+        $image_file_img_3 = $_FILES['img_3']['tmp_name'];
+        $image_name_img_3 = $_FILES['img_3']['name'];
+        $image_extension_img_3 = pathinfo($image_name_img_3, PATHINFO_EXTENSION);
+        $image_path_img_3 = 'img_slider/' . uniqid() . '.' . $image_extension_img_3;
+
+        $image_file_img_4 = $_FILES['img_4']['tmp_name'];
+        $image_name_img_4 = $_FILES['img_4']['name'];
+        $image_extension_img_4 = pathinfo($image_name_img_4, PATHINFO_EXTENSION);
+        $image_path_img_4 = 'img_slider/' . uniqid() . '.' . $image_extension_img_4;
+
+        $image_file_img_5 = $_FILES['img_5']['tmp_name'];
+        $image_name_img_5 = $_FILES['img_5']['name'];
+        $image_extension_img_5 = pathinfo($image_name_img_5, PATHINFO_EXTENSION);
+        $image_path_img_5 = 'img_slider/' . uniqid() . '.' . $image_extension_img_5;
+
+
+        // Di chuyển tệp hình ảnh vào thư mục
+        if (move_uploaded_file($image_file_img_1, $image_path_img_1)) {
+            move_uploaded_file($image_file_img_2, $image_path_img_2);
+            move_uploaded_file($image_file_img_3, $image_path_img_3);
+            move_uploaded_file($image_file_img_4, $image_path_img_4);
+            move_uploaded_file($image_file_img_5, $image_path_img_5);
+
+            $image_filename_img_one = basename($image_path_img_1);
+            $image_filename_img_two = basename($image_path_img_2);
+            $image_filename_img_three = basename($image_path_img_3);
+            $image_filename_img_four = basename($image_path_img_4);
+            $image_filename_img_five = basename($image_path_img_5);
+
+            $query = "INSERT INTO sliders (img_1, img_2, img_3, img_4, img_5)
+                      VALUES ('$image_filename_img_one', '$image_filename_img_two', '$image_filename_img_three', '$image_filename_img_four', '$image_filename_img_five')";
+
+            if (mysqli_query($con, $query)) {
+                $response = array("errorcode_img_sliders" => "000", "message" => "imgs added successfully");
+                echo json_encode($response);
+            } else {
+                $response = array("errorcode_img_sliders" => "111", "message" => "Failed to add imgs");
+                echo json_encode($response);
+            }
+        } else {
+            $response = array("errorcode_img_sliders" => "111", "message" => "Failed to move uploaded image");
+            echo json_encode($response);
+        }
+    } else {
+        $response = array("errorcode_img_sliders" => "111", "message" => "No image uploaded");
+        echo json_encode($response);
+    }
+}
+
+function update_slider()
+{
+    global $con;
+    $slider_id = $_POST["slider_id"];
+
+    if (isset($_POST["slider_id"])) {
+        // Xóa ảnh cũ trước khi cập nhật ảnh mới
+        $query_select_old_images = "SELECT img_1, img_2, img_3, img_4, img_5 FROM sliders WHERE slider_id = '$slider_id'";
+        $result_select_old_images = mysqli_query($con, $query_select_old_images);
+        $row = mysqli_fetch_assoc($result_select_old_images);
+        $old_img_1 = $row['img_1'];
+        $old_img_2 = $row['img_2'];
+        $old_img_3 = $row['img_3'];
+        $old_img_4 = $row['img_4'];
+        $old_img_5 = $row['img_5'];
+
+        // Xử lý và lưu hình ảnh
+        $image_filenames = array();
+        $image_filenames[1] = $old_img_1;
+        $image_filenames[2] = $old_img_2;
+        $image_filenames[3] = $old_img_3;
+        $image_filenames[4] = $old_img_4;
+        $image_filenames[5] = $old_img_5;
+
+        for ($i = 1; $i <= 5; $i++) {
+            $image_file = isset($_FILES['img_' . $i]['tmp_name']) ? $_FILES['img_' . $i]['tmp_name'] : null;
+            $image_name = isset($_FILES['img_' . $i]['name']) ? $_FILES['img_' . $i]['name'] : null;
+
+            if ($image_file && $image_name) {
+                $image_extension = pathinfo($image_name, PATHINFO_EXTENSION);
+                $image_path = 'img_slider/' . uniqid() . '.' . $image_extension;
+
+                if (move_uploaded_file($image_file, $image_path)) {
+                    unlink('img_slider/' . $image_filenames[$i]);
+                    $image_filenames[$i] = basename($image_path);
+                }
+            }
+        }
+
+        // Thực hiện truy vấn UPDATE để cập nhật thông tin slider
+        $query = "UPDATE sliders SET img_1='$image_filenames[1]', img_2='$image_filenames[2]', img_3='$image_filenames[3]', img_4='$image_filenames[4]', img_5='$image_filenames[5]' WHERE slider_id = '$slider_id'";
+
+        if (mysqli_query($con, $query)) {
+            $response = array("errorcode_img_sliders" => "000", "message" => "Slider updated successfully");
+            echo json_encode($response);
+        } else {
+            $response = array("errorcode_img_sliders" => "111", "message" => "Failed to update slider");
+            echo json_encode($response);
+        }
+    } else {
+        $response = array("errorcode_img_sliders" => "111", "message" => "Slider ID not provided");
+        echo json_encode($response);
+    }
+}
+
+function discount_product_home()
+{
+    global $con;
+
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM Products WHERE discount >= 20";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product = array(
+                "product_id" => $row["product_id"],
+                "name" => $row["name"],
+                "image_url" => $row["image_url"],
+                "price" => $row["price"],
+                "discount" => $row["discount"]
+            );
+            $products[] = $product;
+        }
+
+        echo json_encode($products);
+    } else {
+        $response = array("discount_product_home_err" => "111", "message" => "No products found with discount 20 or above");
+        echo json_encode($response);
+    }
+}
+
+function random_discount_products()
+{
+    global $con;
+
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM Products";
+    $result = mysqli_query($con, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $products = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $product = array(
+                "product_id" => $row["product_id"],
+                "name" => $row["name"],
+                "image_url" => $row["image_url"],
+                "price" => $row["price"],
+                "discount" => $row["discount"]
+            );
+            $products[] = $product;
+        }
+
+        // Chọn ngẫu nhiên 10 sản phẩm từ danh sách
+        $random_products = array_rand($products, 10);
+        $selected_products = array();
+
+        foreach ($random_products as $index) {
+            $selected_products[] = $products[$index];
+        }
+
+        echo json_encode($selected_products);
+    } else {
+        $response = array("random_product_home_err" => "111", "message" => "No products found");
+        echo json_encode($response);
+    }
+}
 
 
 switch ($action) {
@@ -1473,6 +1725,34 @@ switch ($action) {
 
     case "get_history_detail":
         get_history_detail();
+        break;
+
+    case "add_notification":
+        add_notification();
+        break;
+
+    case "get_notifications":
+        get_notifications();
+        break;
+
+    case "get_all_slider":
+        get_all_slider();
+        break;
+
+    case "add_slider":
+        add_slider();
+        break;
+
+    case "update_slider":
+        update_slider();
+        break;
+
+    case "discount_product_home":
+        discount_product_home();
+        break;
+
+    case "random_discount_products":
+        random_discount_products();
         break;
 
     default :
