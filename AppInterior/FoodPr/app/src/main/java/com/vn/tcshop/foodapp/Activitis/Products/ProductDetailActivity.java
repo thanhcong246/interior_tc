@@ -297,15 +297,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
     }
 
-    // quay lại trang slider đầu khi mà chạy hết
-    private void reverseSlider() {
-        if (currentPage == 0) {
-            currentPage = imageUrls.length - 1;
-        } else {
-            currentPage = 0;
-        }
-        viewPager.setCurrentItem(currentPage, true);
-    }
 
     private void getProductReview(int productId) {
         RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
@@ -411,6 +402,16 @@ public class ProductDetailActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.product_detail_fragment_container, fragment)
                 .commit();
+    }
+
+    // quay lại trang slider đầu khi mà chạy hết
+    private void reverseSlider() {
+        if (currentPage == 0) {
+            currentPage = imageUrls.length - 1;
+        } else {
+            currentPage = 0;
+        }
+        viewPager.setCurrentItem(currentPage, true);
     }
 
     private void createIndicators() {

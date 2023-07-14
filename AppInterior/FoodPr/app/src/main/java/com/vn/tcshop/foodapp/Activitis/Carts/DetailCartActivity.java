@@ -22,9 +22,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.vn.tcshop.foodapp.Activitis.Accounts.EmailSender;
 import com.vn.tcshop.foodapp.Activitis.Accounts.RecoverCodeActivity;
 import com.vn.tcshop.foodapp.Activitis.Accounts.RecoverEmailActivity;
+import com.vn.tcshop.foodapp.Activitis.Settings.MyNotificationManager;
 import com.vn.tcshop.foodapp.Models.CartByPayment;
 import com.vn.tcshop.foodapp.Models.City;
 import com.vn.tcshop.foodapp.Models.District;
+import com.vn.tcshop.foodapp.Models.Notification;
 import com.vn.tcshop.foodapp.Models.Payments;
 import com.vn.tcshop.foodapp.Models.Province;
 import com.vn.tcshop.foodapp.Models.Responses.CartDeleteAllResponse;
@@ -39,6 +41,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -140,6 +143,7 @@ public class DetailCartActivity extends AppCompatActivity {
                     return;
                 }
 
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(DetailCartActivity.this);
                 builder.setTitle("Xác nhận thanh toán")
                         .setMessage("Bạn có chắc chắn muốn tiến hành thanh toán?")
@@ -162,11 +166,17 @@ public class DetailCartActivity extends AppCompatActivity {
                                                 if (caseP == 1) {
                                                     deleteAllProductCart(savedEmail);
                                                     sendMailPayment(savedName, savedEmail, quantityProduct, total);
+                                                    // Gọi hàm showNotification() để hiển thị thông báo
+                                                    MyNotificationManager.showNotification(getApplicationContext(), "Đặt hàng thành công", "Chúng tôi sẽ xác nhận trong vòng vài phút vui lòng kiểm tra email");
+                                                    notification_add(savedEmail);
                                                     startActivity(new Intent(DetailCartActivity.this, CartActivity.class));
                                                     finish();
                                                 } else {
                                                     deleteAllProductCartPayment(savedEmail);
                                                     sendMailPayment(savedName, savedEmail, quantityProduct, total);
+                                                    // Gọi hàm showNotification() để hiển thị thông báo
+                                                    MyNotificationManager.showNotification(getApplicationContext(), "Đặt hàng thành công", "Chúng tôi sẽ xác nhận trong vòng vài phút vui lòng kiểm tra email");
+                                                    notification_add(savedEmail);
                                                     startActivity(new Intent(DetailCartActivity.this, PaymentActivity.class));
                                                     finish();
                                                 }
@@ -192,6 +202,41 @@ public class DetailCartActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void notification_add(String savedEmail) {
+        SharedPreferences saveNotifiPayment = getSharedPreferences("notification_payment", Context.MODE_PRIVATE);
+        final int[] notificationCount = {saveNotifiPayment.getInt("notifi", 0)}; // Lấy giá trị hiện tại của notifi từ SharedPreferences
+
+        final RetrofitApi[] retrofitApi = {constant.retrofit.create(RetrofitApi.class)};
+        Call<Notification> call = retrofitApi[0].add_notification("Đặt hàng thành công", savedEmail);
+        call.enqueue(new Callback<Notification>() {
+            @Override
+            public void onResponse(Call<Notification> call, Response<Notification> response) {
+                if (response.isSuccessful()) {
+                    Notification notification = response.body();
+                    String erre_noti = notification.getNotifications_s();
+                    if (Objects.equals(erre_noti, "000")) {
+                        Log.d("notifi", "000");
+                        notificationCount[0]++; // Tăng giá trị lên 1 khi Log.d("notifi", "000") được gọi
+                    } else {
+                        Log.d("notifi", "111");
+                    }
+
+                    // Lưu thông tin thông báo
+                    SharedPreferences.Editor editor = saveNotifiPayment.edit();
+                    editor.putInt("notifi", notificationCount[0]);
+                    editor.apply();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Notification> call, Throwable t) {
+
+            }
+        });
+    }
+
+
 
     private void sendMailPayment(String savedName, String savedEmail, int quantityProduct, int total) {
 

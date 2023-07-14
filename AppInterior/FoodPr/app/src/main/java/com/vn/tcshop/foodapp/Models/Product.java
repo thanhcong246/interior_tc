@@ -5,16 +5,7 @@ public class Product {
     private String name;
     private String image_url;
     private int price;
-
-    public Product(int product_id, String name, String image_url, int price) {
-        this.product_id = product_id;
-        this.name = name;
-        this.image_url = image_url;
-        this.price = price;
-    }
-
-    public Product() {
-    }
+    private int discount;
 
     public int getProduct_id() {
         return product_id;
@@ -46,5 +37,13 @@ public class Product {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
     }
 }

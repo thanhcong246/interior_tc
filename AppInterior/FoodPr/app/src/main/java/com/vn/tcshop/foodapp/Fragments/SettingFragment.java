@@ -33,6 +33,8 @@ import com.vn.tcshop.foodapp.Activitis.Historys.HistoryActivity;
 import com.vn.tcshop.foodapp.Activitis.HomeActivity;
 import com.vn.tcshop.foodapp.Activitis.MainActivity;
 import com.vn.tcshop.foodapp.Activitis.Products.ProductActivity;
+import com.vn.tcshop.foodapp.Activitis.Settings.NotificationActivity;
+import com.vn.tcshop.foodapp.Activitis.Settings.QuestionActivity;
 import com.vn.tcshop.foodapp.Activitis.Settings.SettingActivity;
 import com.vn.tcshop.foodapp.Adapters.MenuAdapter;
 import com.vn.tcshop.foodapp.Models.MenuItemModel;
@@ -59,7 +61,7 @@ public class SettingFragment extends Fragment {
         setHasOptionsMenu(true); // Bật chế độ hiển thị menu
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-        gsc = GoogleSignIn.getClient(getActivity(),gso);
+        gsc = GoogleSignIn.getClient(getActivity(), gso);
 
         menuItems = getMenuItems();
 
@@ -87,6 +89,7 @@ public class SettingFragment extends Fragment {
                         startActivity(new Intent(getActivity(), CartActivity.class));
                         break;
                     case "Thông báo":
+                        get_notification();
                         break;
                     case "Lịch sử giao dịch":
                         startActivity(new Intent(getActivity(), HistoryActivity.class));
@@ -95,6 +98,7 @@ public class SettingFragment extends Fragment {
                         linkChatFB();
                         break;
                     case "Câu hỏi thường gặp":
+                        startActivity(new Intent(getActivity(), QuestionActivity.class));
                         break;
                     case "Đăng xuất":
                         logout_btn();
@@ -105,6 +109,14 @@ public class SettingFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void get_notification() {
+        SharedPreferences saveNotifiPayment = requireContext().getSharedPreferences("notification_payment", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = saveNotifiPayment.edit();
+        editor.putInt("notifi", 0); // Đặt giá trị "notifi" về 0
+        editor.apply();
+        startActivity(new Intent(getActivity(), NotificationActivity.class));
     }
 
     private void linkChatFB() {

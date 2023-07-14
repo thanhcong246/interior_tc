@@ -5,6 +5,7 @@ import com.vn.tcshop.foodapp.Models.CartByPayment;
 import com.vn.tcshop.foodapp.Models.Category;
 import com.vn.tcshop.foodapp.Models.City;
 import com.vn.tcshop.foodapp.Models.District;
+import com.vn.tcshop.foodapp.Models.Notification;
 import com.vn.tcshop.foodapp.Models.Payment;
 import com.vn.tcshop.foodapp.Models.Payments;
 import com.vn.tcshop.foodapp.Models.Product;
@@ -15,6 +16,7 @@ import com.vn.tcshop.foodapp.Models.Product_detail_desc;
 import com.vn.tcshop.foodapp.Models.Product_detail_reviews;
 import com.vn.tcshop.foodapp.Models.Product_detail_specifications;
 import com.vn.tcshop.foodapp.Models.Province;
+import com.vn.tcshop.foodapp.Models.Slider;
 import com.vn.tcshop.foodapp.Models.Ward;
 import com.vn.tcshop.foodapp.Models.Responses.CartByIdResponse;
 import com.vn.tcshop.foodapp.Models.Responses.CartDeleteAllResponse;
@@ -256,4 +258,26 @@ public interface RetrofitApi {
     Call<Payment> get_history_detail(
             @Field("payment_id") int payment_id
     );
+
+    @FormUrlEncoded
+    @POST("add_notification")
+    Call<Notification> add_notification(
+            @Field("title") String title,
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("get_notifications")
+    Call<List<Notification>> get_notifications(
+            @Field("email") String email
+    );
+
+    @GET("get_all_slider")
+    Call<List<Slider>> get_all_slider();
+
+    @GET("discount_product_home")
+    Call<List<Product>> discount_product_home();
+
+    @GET("random_discount_products")
+    Call<List<Product>> random_discount_products();
 }

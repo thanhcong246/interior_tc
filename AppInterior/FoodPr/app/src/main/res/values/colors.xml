@@ -11,4 +11,5 @@
     <color name="start5">#5cb85c</color>
     <color name="start0">#d0cfd1</color>
     <color name="transparent">#4C000000</color>
+    <color name="notification_color">#F44336</color>
 </resources>

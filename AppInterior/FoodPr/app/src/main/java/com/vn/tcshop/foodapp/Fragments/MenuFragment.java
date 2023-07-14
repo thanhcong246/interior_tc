@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.vn.tcshop.foodapp.Activitis.Accounts.LoginActivity;
 import com.vn.tcshop.foodapp.Activitis.MainActivity;
+import com.vn.tcshop.foodapp.Activitis.Settings.NotificationActivity;
 import com.vn.tcshop.foodapp.Adapters.MenuAdapter;
 import com.vn.tcshop.foodapp.Activitis.Carts.CartActivity;
 import com.vn.tcshop.foodapp.Models.MenuItemModel;
@@ -99,6 +100,7 @@ public class MenuFragment extends Fragment {
                         startActivity(new Intent(getActivity(), CartActivity.class));
                         break;
                     case "Thông báo":
+                        get_notification();
                         break;
                     case "Cài đặt":
                         startActivity(new Intent(getActivity(), SettingActivity.class));
@@ -124,6 +126,14 @@ public class MenuFragment extends Fragment {
         close_menu();
 
         return view;
+    }
+
+    private void get_notification() {
+        SharedPreferences saveNotifiPayment = requireContext().getSharedPreferences("notification_payment", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = saveNotifiPayment.edit();
+        editor.putInt("notifi", 0); // Đặt giá trị "notifi" về 0
+        editor.apply();
+        startActivity(new Intent(getActivity(), NotificationActivity.class));
     }
 
     @Override

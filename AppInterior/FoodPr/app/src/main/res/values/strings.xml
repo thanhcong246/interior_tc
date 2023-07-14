@@ -29,4 +29,19 @@
     <string name="getback_submit">Xác nhận</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="question1">1. Các sản phẩm gỗ nội thất phổ biến là gì?</string>
+    <string name="question2">2. Đồ gỗ nội thất nào phù hợp với phong cách nội thất của tôi?</string>
+    <string name="question3">3. Tôi có thể tìm hiểu thêm về nguồn gốc và chất lượng của các sản phẩm gỗ không?</string>
+    <string name="question4">4. Các loại gỗ thông dụng được sử dụng trong đồ nội thất là gì?</string>
+    <string name="question5">5. Làm thế nào để bảo quản và chăm sóc đồ gỗ nội thất?</string>
+    <string name="question6">6. Có những điều cần lưu ý khi chọn mua đồ gỗ nội thất?</string>
+    <string name="question7">7. Tôi có thể đặt hàng tùy chỉnh để làm đồ gỗ nội thất theo ý của mình không?</string>
+    <string name="reply1">Các sản phẩm gỗ nội thất phổ biến bao gồm bàn ghế, tủ kệ, giường, tủ quần áo, bàn trang điểm, bàn ăn, bàn làm việc, kệ sách và nhiều hơn nữa.</string>
+    <string name="reply2">Phụ thuộc vào phong cách nội thất của bạn, bạn có thể lựa chọn giữa các phong cách như hiện đại, cổ điển, vintage, nông thôn, scandinavian, công nghiệp và nhiều phong cách khác. Quan trọng là chọn những mẫu đồ gỗ phù hợp với phong cách và không gian của bạn.</string>
+    <string name="reply3">Tất nhiên! Khi mua đồ gỗ nội thất, bạn có thể yêu cầu cửa hàng cung cấp thông tin về nguồn gốc gỗ, liệu chúng có được sản xuất bền vững hay không, có chứng chỉ FSC không (Chương trình chứng nhận rừng bền vững), và thông tin về quy trình sản xuất và chất lượng sản phẩm.</string>
+    <string name="reply4">Một số loại gỗ thông dụng được sử dụng trong đồ gỗ nội thất bao gồm gỗ sồi, gỗ thông, gỗ hồng đào, gỗ teak, gỗ mahogany và gỗ bách xanh. Mỗi loại gỗ có đặc điểm riêng về màu sắc, độ cứng và độ bền, nên bạn có thể chọn loại gỗ phù hợp với nhu cầu và sở thích của bạn.</string>
+    <string name="reply5">Để bảo quản và chăm sóc đồ gỗ nội thất, bạn có thể thực hiện các biện pháp như lau sạch bụi bẩn thường xuyên, tránh tiếp xúc với nước và các chất tẩy rửa mạnh, đặt đồ gỗ ở nơi thoáng mát và tránh ánh nắng mặt trời trực tiếp. Đồ gỗ cũng có thể cần được bảo dưỡng định kỳ, như đánh bóng và bảo vệ bề mặt.</string>
+    <string name="reply6">Khi chọn mua đồ gỗ nội thất, bạn nên lưu ý các yếu tố như kích thước phù hợp với không gian của bạn, chất lượng và độ bền của sản phẩm, phong cách phù hợp với nội thất hiện có, và ngân sách của bạn.</string>
+    <string name="reply7">Có, nhiều cửa hàng đồ gỗ nội thất cung cấp dịch vụ đặt hàng tùy chỉnh. Bạn có thể trao đổi với cửa hàng về yêu cầu riêng của mình và họ sẽ tạo ra sản phẩm theo ý của bạn.</string>
 </resources>

@@ -12,4 +12,9 @@ public class Images_Api {
         String imagePath = "img_product_details/" + imageName;
         return BASE_URL + imagePath;
     }
+
+    public static String getImgSlider(String imageName){
+        String imagePath = "img_slider/" + imageName;
+        return BASE_URL + imagePath;
+    }
 }
