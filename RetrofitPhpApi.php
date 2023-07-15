@@ -725,17 +725,19 @@ function add_specifications()
 
     $product_id = $_POST["product_id"];
     $width = $_POST["width"];
+    $length = $_POST["length"];
     $height = $_POST["height"];
     $number_of_drawers = $_POST["number_of_drawers"];
     $type = $_POST["type"];
 
     $width = mysqli_real_escape_string($con, $width);
+    $length = mysqli_real_escape_string($con, $length);
     $height = mysqli_real_escape_string($con, $height);
     $number_of_drawers = mysqli_real_escape_string($con, $number_of_drawers);
     $type = mysqli_real_escape_string($con, $type);
 
-    $query = "INSERT INTO specifications (width, height, number_of_drawers, type, product_id) 
-                        VALUES ('$width', '$height', '$number_of_drawers', '$type', '$product_id')";
+    $query = "INSERT INTO specifications (width, length, height, number_of_drawers, type, product_id) 
+                        VALUES ('$width', '$length', '$height', '$number_of_drawers', '$type', '$product_id')";
 
     if (mysqli_query($con, $query)) {
         $response = array("error_product_detail_specifications" => "000", "message" => "Product specifications added successfully");
@@ -753,16 +755,18 @@ function update_specifications()
     $specification_id = $_POST["specification_id"];
     $product_id = $_POST["product_id"];
     $width = $_POST["width"];
+    $length = $_POST["length"];
     $height = $_POST["height"];
     $number_of_drawers = $_POST["number_of_drawers"];
     $type = $_POST["type"];
 
     $width = mysqli_real_escape_string($con, $width);
+    $length = mysqli_real_escape_string($con, $length);
     $height = mysqli_real_escape_string($con, $height);
     $number_of_drawers = mysqli_real_escape_string($con, $number_of_drawers);
     $type = mysqli_real_escape_string($con, $type);
 
-    $query = "UPDATE specifications SET width = '$width', height = '$height', number_of_drawers = '$number_of_drawers', type = '$type', product_id = '$product_id' WHERE specification_id = '$specification_id'";
+    $query = "UPDATE specifications SET width = '$width', length = '$length', height = '$height', number_of_drawers = '$number_of_drawers', type = '$type', product_id = '$product_id' WHERE specification_id = '$specification_id'";
 
     if (mysqli_query($con, $query)) {
         $response = array("error_product_detail_specifications" => "000", "message" => "Product specifications updated successfully");
@@ -805,7 +809,7 @@ function get_product_by_id_specification()
 
     $product_id = $_POST["product_id"];
 
-    $query = "SELECT specifications.width, specifications.height, specifications.number_of_drawers, specifications.type
+    $query = "SELECT specifications.width, specifications.length, specifications.height, specifications.number_of_drawers, specifications.type
           FROM specifications
           LEFT JOIN Products ON specifications.product_id = Products.product_id
           WHERE Products.product_id = '$product_id'";
