@@ -15,7 +15,7 @@ function register()
     $email = $_POST["email"];
     $password = $_POST["password"];
 
-    // Kiểm tra sự tồn tại của tên hoặc email
+    // Kiểm tra sự tồn tại của tên
     $check_query = "SELECT name FROM users WHERE name = '$name'";
     $check_result = mysqli_query($con, $check_query);
 
