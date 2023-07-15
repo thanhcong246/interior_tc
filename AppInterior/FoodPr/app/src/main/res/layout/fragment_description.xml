@@ -9,6 +9,7 @@
         android:id="@+id/product_detail_description_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:justificationMode="inter_word"
         android:textColor="#000000"
         android:textSize="13sp" />
 
