@@ -49,7 +49,6 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edt_border"
             android:hint="....."
-            android:text="cong@gmail.com"
             android:paddingStart="20dp"
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
@@ -72,7 +71,6 @@
             android:hint="....."
             android:inputType="textPassword"
             android:paddingStart="20dp"
-            android:text="cong12"
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
             android:paddingBottom="10dp" />

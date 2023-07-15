@@ -211,7 +211,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         btn_add_payment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String cleanInput = product_detail_price_dt_cart.replaceAll(",", "");
+                String cleanInput = product_detail_price_dt_cart.replaceAll("[,.]", "");
                 int price_cart = Integer.parseInt(cleanInput);
                 RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
                 Call<CartByIdResponse> call = retrofitApi.add_cart_payment_by_id(productId_dt, saveEmail, price_cart, product_name_dt, image_url_dt);
@@ -244,7 +244,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         btn_add_cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String cleanInput = product_detail_price_dt_cart.replaceAll(",", "");
+                String cleanInput = product_detail_price_dt_cart.replaceAll("[,.]", "");
                 int price_cart = Integer.parseInt(cleanInput);
                 RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
                 Call<CartByIdResponse> call = retrofitApi.add_cart_by_id(productId_dt, saveEmail, price_cart, product_name_dt, image_url_dt);

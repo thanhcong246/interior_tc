@@ -75,7 +75,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         String imageUrl = Images_Api.getImageUrl(cart.getCart_img());
         Picasso.get().load(imageUrl).into(holder.cart_img_product_id_item);
         // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-        DecimalFormat decimalFormat = new DecimalFormat("#.###");
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
         String priceFormatted = decimalFormat.format(cart.getPrice());
         holder.price_cart_product_id_item.setText(priceFormatted + "₫");
 

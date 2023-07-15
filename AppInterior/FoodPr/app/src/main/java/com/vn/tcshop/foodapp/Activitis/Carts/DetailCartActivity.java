@@ -236,8 +236,6 @@ public class DetailCartActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void sendMailPayment(String savedName, String savedEmail, int quantityProduct, int total) {
 
         RetrofitApi retrofitApi = constant.retrofit.create(RetrofitApi.class);
@@ -257,6 +255,9 @@ public class DetailCartActivity extends AppCompatActivity {
                     }
                     if (Objects.equals(error_recover_email, "000")) {
                         Log.d("error_recover_email", email + " " + login_info);
+                        // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
+                        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+                        String priceFormatted = decimalFormat.format(total);
                         String subject = "Food Tech";
                         String body = "Xin chào " + savedName + ",\n" +
                                 "\n" +
@@ -265,7 +266,7 @@ public class DetailCartActivity extends AppCompatActivity {
                                 "- Tên khách hàng: " + savedName + "\n" +
                                 "- Email: " + savedEmail + "\n" +
                                 "- Số lượng sản phẩm: " + quantityProduct + "\n" +
-                                "- Tổng tiền: " + total + "\n" +
+                                "- Tổng tiền: " + priceFormatted + "đ" + "\n" +
                                 "\n" +
                                 "Chúng tôi xác nhận đã nhận thanh toán của bạn và đang tiến hành xử lý đơn hàng. Sản phẩm sẽ được gửi đến địa chỉ đã cung cấp trong thời gian sớm nhất có thể.\n" +
                                 "Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu hỗ trợ nào, vui lòng liên hệ với chúng tôi qua địa chỉ email này. Chúng tôi sẵn lòng giúp đỡ bạn.\n" +
@@ -344,7 +345,7 @@ public class DetailCartActivity extends AppCompatActivity {
                     int total_payment = cartByPayment.getTotal_payment();
 
                     // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                    DecimalFormat decimalFormat = new DecimalFormat("#.###");
+                    DecimalFormat decimalFormat = new DecimalFormat("#,###");
                     String total_payment_format = decimalFormat.format(total_payment);
                     payment_quantity.setText(String.valueOf(total_quantity));
                     payment_total.setText(total_payment_format + "₫");
@@ -378,7 +379,7 @@ public class DetailCartActivity extends AppCompatActivity {
                     editor.apply();
 
                     // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                    DecimalFormat decimalFormat = new DecimalFormat("#.###");
+                    DecimalFormat decimalFormat = new DecimalFormat("#,###");
                     String total_payment_format = decimalFormat.format(total_payment);
                     payment_quantity.setText(String.valueOf(total_quantity));
                     payment_total.setText(total_payment_format + "₫");

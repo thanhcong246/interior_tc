@@ -246,7 +246,7 @@ public class HomeActivity extends AppCompatActivity {
                             String img_url_four_dt = product_detail.getImg_url_four();
 
                             // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                            DecimalFormat decimalFormat = new DecimalFormat("#.###");
+                            DecimalFormat decimalFormat = new DecimalFormat("#,###");
                             String priceFormatted = decimalFormat.format(product_detail_price_dt);
                             String oldPriceFormatted = decimalFormat.format(product_detail_old_price_dt);
 
@@ -302,7 +302,7 @@ public class HomeActivity extends AppCompatActivity {
                             String img_url_four_dt = product_detail.getImg_url_four();
 
                             // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                            DecimalFormat decimalFormat = new DecimalFormat("#.###");
+                            DecimalFormat decimalFormat = new DecimalFormat("#,###");
                             String priceFormatted = decimalFormat.format(product_detail_price_dt);
                             String oldPriceFormatted = decimalFormat.format(product_detail_old_price_dt);
 
@@ -358,7 +358,7 @@ public class HomeActivity extends AppCompatActivity {
                             String img_url_four_dt = product_detail.getImg_url_four();
 
                             // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                            DecimalFormat decimalFormat = new DecimalFormat("#.###");
+                            DecimalFormat decimalFormat = new DecimalFormat("#,###");
                             String priceFormatted = decimalFormat.format(product_detail_price_dt);
                             String oldPriceFormatted = decimalFormat.format(product_detail_old_price_dt);
 

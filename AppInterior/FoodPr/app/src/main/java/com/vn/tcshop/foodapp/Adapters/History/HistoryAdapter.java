@@ -70,7 +70,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         public void bind(Payment payment) {
             // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-            DecimalFormat decimalFormat = new DecimalFormat("#.###");
+            DecimalFormat decimalFormat = new DecimalFormat("#,###");
             String priceFormatted = decimalFormat.format(payment.getTotal());
             date.setText(payment.getPayment_date());
             total.setText(priceFormatted + "đ");

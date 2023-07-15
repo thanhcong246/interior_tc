@@ -57,7 +57,7 @@ public class HistoryDetailActivity extends AppCompatActivity {
                     Payment payment = response.body();
                     assert payment != null;
                     // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
-                    DecimalFormat decimalFormat = new DecimalFormat("#.###");
+                    DecimalFormat decimalFormat = new DecimalFormat("#,###");
                     String priceFormatted = decimalFormat.format(payment.getTotal());
 
                     pm_name.setText(payment.getName());

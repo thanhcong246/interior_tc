@@ -14,6 +14,7 @@ import com.vn.tcshop.foodapp.Models.Product;
 import com.vn.tcshop.foodapp.R;
 import com.vn.tcshop.foodapp.Retrofits.Apis.Images_Api;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class ProductDiscountAdapter extends RecyclerView.Adapter<ProductDiscountAdapter.ViewHolder> {
@@ -43,7 +44,10 @@ public class ProductDiscountAdapter extends RecyclerView.Adapter<ProductDiscount
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Product product = productList.get(position);
         holder.nameProduct.setText(product.getName());
-        holder.priceProduct.setText(product.getPrice() + "đ");
+        // Hiển thị giá sản phẩm với định dạng ngăn cách hàng nghìn
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+        String priceFormatted = decimalFormat.format(product.getPrice());
+        holder.priceProduct.setText(priceFormatted + "đ");
         holder.discountProduct.setText(product.getDiscount() + "%");
         String urlImg = Images_Api.getImageUrl(product.getImage());
         Picasso.get().load(urlImg).into(holder.imgProduct);
