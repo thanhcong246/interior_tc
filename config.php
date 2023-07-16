@@ -4,10 +4,15 @@
     $password = "";
     $db = "interior_tc";
 
-    $con = @mysqli_connect($host,$username,$password,$db) or dir(mysqli_error);
-//    if($con -> connect_error){
+//    $host = "sql202.infinityfree.com";
+//    $username = "if0_34529479";
+//    $password = "";
+//    $db = "if0_34529479_interior_tc";
+
+    $con = @mysqli_connect($host, $username, $password, $db) or dir(mysqli_error);
+//    if ($con->connect_error) {
 //        echo "failed";
-//    }else{
+//    } else {
 //        echo "success";
 //    }
 ?>

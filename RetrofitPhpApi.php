@@ -311,7 +311,7 @@ function add_product()
         if (move_uploaded_file($image_file, $image_path)) {
             $image_filename = basename($image_path);
 
-            $query = "INSERT INTO Products (name, image_url, old_price, category_id, discount)
+            $query = "INSERT INTO products (name, image_url, old_price, category_id, discount)
                       VALUES ('$name', '$image_filename', $old_price, $category_id, $discount)";
 
             if (mysqli_query($con, $query)) {
@@ -344,7 +344,7 @@ function update_product()
     $name = mysqli_real_escape_string($con, $name);
 
     // Lấy thông tin sản phẩm cũ
-    $query_select = "SELECT image_url FROM Products WHERE product_id = $product_id";
+    $query_select = "SELECT image_url FROM products WHERE product_id = $product_id";
     $result_select = mysqli_query($con, $query_select);
     $row_select = mysqli_fetch_assoc($result_select);
     $old_image = $row_select['image_url'];
@@ -366,7 +366,7 @@ function update_product()
         if (move_uploaded_file($image_file, $image_path)) {
             $image_filename = basename($image_path);
 
-            $query = "UPDATE Products SET name = '$name', image_url = '$image_filename', old_price = $old_price, category_id = $category_id, discount = $discount WHERE product_id = $product_id";
+            $query = "UPDATE products SET name = '$name', image_url = '$image_filename', old_price = $old_price, category_id = $category_id, discount = $discount WHERE product_id = $product_id";
 
             if (mysqli_query($con, $query)) {
                 $response = array("errorcode" => "000", "message" => "Product updated successfully");
@@ -380,7 +380,7 @@ function update_product()
             echo json_encode($response);
         }
     } else {
-        $query = "UPDATE Products SET name = '$name', old_price = $old_price, category_id = $category_id, discount = $discount WHERE product_id = $product_id";
+        $query = "UPDATE products SET name = '$name', old_price = $old_price, category_id = $category_id, discount = $discount WHERE product_id = $product_id";
 
         if (mysqli_query($con, $query)) {
             $response = array("errorcode" => "000", "message" => "Product updated successfully");
@@ -402,7 +402,7 @@ function search_products()
 
     // Tìm kiếm theo tên sản phẩm và áp dụng giảm giá
     $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price 
-              FROM Products 
+              FROM products 
               WHERE name LIKE '%$search_product%'";
     $result = mysqli_query($con, $query);
 
@@ -458,7 +458,7 @@ function get_all_product()
 {
     global $con;
 
-    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM Products";
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM products";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
@@ -490,7 +490,7 @@ function get_all_product_by_category_id()
     $category_id = mysqli_real_escape_string($con, $category_id);
 
     $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price 
-              FROM Products 
+              FROM products 
               WHERE category_id = $category_id";
     $result = mysqli_query($con, $query);
 
@@ -520,10 +520,10 @@ function get_product_by_id()
 
     $product_id = $_POST["product_id"];
 
-    $query = "SELECT Products.product_id, Products.name, Products.old_price, Products.image_url, Products.discount, CAST(Products.old_price - (Products.old_price * Products.discount / 100) AS INT) AS price, Product_Details.img_url_one, Product_Details.img_url_two, Product_Details.img_url_three, Product_Details.img_url_four
-              FROM Products
-              LEFT JOIN product_details ON Products.product_id = product_details.product_id
-              WHERE Products.product_id = '$product_id'";
+    $query = "SELECT products.product_id, products.name, products.old_price, products.image_url, products.discount, CAST(products.old_price - (products.old_price * products.discount / 100) AS INT) AS price, product_details.img_url_one, product_details.img_url_two, product_details.img_url_three, product_details.img_url_four
+              FROM products
+              LEFT JOIN product_details ON products.product_id = product_details.product_id
+              WHERE products.product_id = '$product_id'";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
@@ -785,8 +785,8 @@ function get_product_by_id_description()
 
     $query = "SELECT product_detail_descriptions.description
           FROM product_detail_descriptions
-          LEFT JOIN Products ON product_detail_descriptions.product_id = Products.product_id
-          WHERE Products.product_id = '$product_id'";
+          LEFT JOIN products ON product_detail_descriptions.product_id = products.product_id
+          WHERE products.product_id = '$product_id'";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
@@ -811,8 +811,8 @@ function get_product_by_id_specification()
 
     $query = "SELECT specifications.width, specifications.length, specifications.height, specifications.number_of_drawers, specifications.type
           FROM specifications
-          LEFT JOIN Products ON specifications.product_id = Products.product_id
-          WHERE Products.product_id = '$product_id'";
+          LEFT JOIN products ON specifications.product_id = products.product_id
+          WHERE products.product_id = '$product_id'";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
@@ -1509,7 +1509,7 @@ function discount_product_home()
 {
     global $con;
 
-    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM Products WHERE discount >= 20";
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM products WHERE discount >= 20";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
@@ -1537,7 +1537,7 @@ function random_discount_products()
 {
     global $con;
 
-    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM Products";
+    $query = "SELECT *, CAST(old_price - (old_price * discount / 100) AS INT) AS price FROM products";
     $result = mysqli_query($con, $query);
 
     if (mysqli_num_rows($result) > 0) {
