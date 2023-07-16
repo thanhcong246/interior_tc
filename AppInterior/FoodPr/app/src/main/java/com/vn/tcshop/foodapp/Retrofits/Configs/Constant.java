@@ -10,7 +10,8 @@ public class Constant {
     Gson gson = new GsonBuilder().setLenient().create();
 
     public Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://192.168.15.1:86/interior_app/RetrofitPhpApi.php/")
+//            .baseUrl("http://192.168.1.9:86/interior_app/RetrofitPhpApi.php/")
+            .baseUrl("https://tcshopfd.000webhostapp.com/interior_app/RetrofitPhpApi.php/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build();
 }

@@ -17,9 +17,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Activitis.Homes.HomecsActivity"
-            android:exported="false" />
-        <activity
             android:name=".Activitis.Settings.NotificationActivity"
             android:exported="false" />
         <activity
